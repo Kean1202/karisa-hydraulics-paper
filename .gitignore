@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Claude Code settings (local configuration)
+.claude/
+
+# Results and outputs
+results/
+eda_plots/
+*.png
+*.jpg
+*.pdf
+for_karisa_with_love_*.png
+
+# Excel outputs (keep original data, ignore generated results)
+results/**/*.xlsx
+Hydraulics_Analysis_Results.xlsx
+Quality_Analysis_Results.xlsx
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.log
+*.tmp
+.cache/
