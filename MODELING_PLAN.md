@@ -102,80 +102,72 @@ Understand which variables influence hydraulic behavior and product quality, and
 ### Phase 3: Quality Analysis (pass_only dataset)
 
 #### Goal A3: Rank variables influencing CONVERSION
-- [ ] Train all models with 5-fold CV:
-  - [ ] Linear Regression (with StandardScaler)
-    - [ ] Extract coefficients (averaged across folds)
-    - [ ] Evaluate: RMSE, MAE, R²
-  - [ ] Ridge Regression (with StandardScaler)
-    - [ ] Extract coefficients (averaged across folds)
-    - [ ] Evaluate: RMSE, MAE, R²
-  - [ ] Random Forest Regressor
-    - [ ] Extract feature importances (averaged across folds)
-    - [ ] Generate SHAP values
-    - [ ] Evaluate: RMSE, MAE, R²
-  - [ ] XGBoost Regressor
-    - [ ] Extract feature importances (averaged across folds)
-    - [ ] Generate SHAP values
-    - [ ] Evaluate: RMSE, MAE, R²
-  - [ ] PLS Regression
-    - [ ] Extract VIP scores (averaged across folds)
-    - [ ] Evaluate: RMSE, MAE, R²
-- [ ] **Model Selection:** Compare performance and select best model for CONVERSION
-- [ ] **Normalize importance scores:** Convert to ranks, then average ranks across models
-- [ ] Create consolidated variable importance ranking table for CONVERSION
-- [ ] Visualize (for selected model only):
-  - [ ] SHAP summary plot (RF or XGB only)
-  - [ ] SHAP dependence plots for top 3 variables (RF or XGB only)
-  - [ ] Actual vs Predicted plot
-  - [ ] Variable importance comparison across all models
+- [x] Train all models with 5-fold CV:
+  - [x] Linear Regression (with StandardScaler)
+    - [x] Extract coefficients (averaged across folds)
+    - [x] Evaluate: RMSE, MAE, R²
+  - [x] Ridge Regression (with StandardScaler)
+    - [x] Extract coefficients (averaged across folds)
+    - [x] Evaluate: RMSE, MAE, R²
+  - [x] Random Forest Regressor
+    - [x] Extract feature importances (averaged across folds)
+    - [x] Evaluate: RMSE, MAE, R²
+  - [x] XGBoost Regressor
+    - [x] Extract feature importances (averaged across folds)
+    - [x] Evaluate: RMSE, MAE, R²
+  - [x] PLS Regression
+    - [x] Extract importance scores (averaged across folds)
+    - [x] Evaluate: RMSE, MAE, R²
+- [x] **Model Selection:** Compare performance and select best model for CONVERSION
+- [x] **Normalize importance scores:** Convert to ranks, then average ranks across models
+- [x] Create consolidated variable importance ranking table for CONVERSION
+- [x] Visualize:
+  - [x] Variable importance comparison across all models
+  - [x] Model performance comparison plot
 
 #### Goal A4: Rank variables influencing PURITY
-- [ ] Train all models with 5-fold CV:
-  - [ ] Linear Regression (with StandardScaler)
-    - [ ] Extract coefficients (averaged across folds)
-    - [ ] Evaluate: RMSE, MAE, R²
-  - [ ] Ridge Regression (with StandardScaler)
-    - [ ] Extract coefficients (averaged across folds)
-    - [ ] Evaluate: RMSE, MAE, R²
-  - [ ] Random Forest Regressor
-    - [ ] Extract feature importances (averaged across folds)
-    - [ ] Generate SHAP values
-    - [ ] Evaluate: RMSE, MAE, R²
-  - [ ] XGBoost Regressor
-    - [ ] Extract feature importances (averaged across folds)
-    - [ ] Generate SHAP values
-    - [ ] Evaluate: RMSE, MAE, R²
-  - [ ] PLS Regression
-    - [ ] Extract VIP scores (averaged across folds)
-    - [ ] Evaluate: RMSE, MAE, R²
-- [ ] **Model Selection:** Compare performance and select best model for PURITY
-- [ ] **Normalize importance scores:** Convert to ranks, then average ranks across models
-- [ ] Create consolidated variable importance ranking table for PURITY
-- [ ] Visualize (for selected model only):
-  - [ ] SHAP summary plot (RF or XGB only)
-  - [ ] SHAP dependence plots for top 3 variables (RF or XGB only)
-  - [ ] Actual vs Predicted plot
-  - [ ] Variable importance comparison across all models
+- [x] Train all models with 5-fold CV:
+  - [x] Linear Regression (with StandardScaler)
+    - [x] Extract coefficients (averaged across folds)
+    - [x] Evaluate: RMSE, MAE, R²
+  - [x] Ridge Regression (with StandardScaler)
+    - [x] Extract coefficients (averaged across folds)
+    - [x] Evaluate: RMSE, MAE, R²
+  - [x] Random Forest Regressor
+    - [x] Extract feature importances (averaged across folds)
+    - [x] Evaluate: RMSE, MAE, R²
+  - [x] XGBoost Regressor
+    - [x] Extract feature importances (averaged across folds)
+    - [x] Evaluate: RMSE, MAE, R²
+  - [x] PLS Regression
+    - [x] Extract importance scores (averaged across folds)
+    - [x] Evaluate: RMSE, MAE, R²
+- [x] **Model Selection:** Compare performance and select best model for PURITY
+- [x] **Normalize importance scores:** Convert to ranks, then average ranks across models
+- [x] Create consolidated variable importance ranking table for PURITY
+- [x] Visualize:
+  - [x] Variable importance comparison across all models
+  - [x] Model performance comparison plot
 
 #### Goal B3: Find combinations with highest CONVERSION
-- [ ] Get all unique combinations of 7 variables from pass_only dataset
-- [ ] Use selected CONV model to predict CONV for each unique combination
-- [ ] Identify top 20 unique combinations with highest CONV
-- [ ] Create combination table with all 7 variable values
-- [ ] Save results to CSV
+- [x] Get all unique combinations of 7 variables from pass_only dataset
+- [x] Use selected CONV model to predict CONV for each unique combination
+- [x] Categorize combinations into performance zones (percentile-based)
+- [x] Create combination table with all 7 variable values and categories
+- [x] Save results to Excel
 
 #### Goal B4: Find combinations with highest PURITY
-- [ ] Get all unique combinations of 7 variables from pass_only dataset
-- [ ] Use selected PURITY model to predict PURITY for each unique combination
-- [ ] Identify top 20 unique combinations with highest PURITY
-- [ ] Create combination table with all 7 variable values
-- [ ] Save results to CSV
+- [x] Get all unique combinations of 7 variables from pass_only dataset
+- [x] Use selected PURITY model to predict PURITY for each unique combination
+- [x] Categorize combinations into performance zones (percentile-based)
+- [x] Create combination table with all 7 variable values and categories
+- [x] Save results to Excel
 
 #### Goal B3+B4 Combined: Find optimal region
-- [ ] Identify unique combinations in top 10% for BOTH CONV and PURITY
-- [ ] Create combined optimal region table
-- [ ] Visualize: 2D plot showing CONV vs PURITY with highlighted optimal region
-- [ ] Save results to CSV
+- [x] Identify unique combinations in top 10% for BOTH CONV and PURITY
+- [x] Create combined optimal region table with simple average scoring
+- [x] Visualize: 2D plot showing CONV vs PURITY with highlighted optimal region
+- [x] Save results to Excel
 
 ---
 
@@ -299,11 +291,11 @@ Karisa/
 **Phase 2 (A2):** ✅ Complete
 **Phase 2 (B1):** ✅ Complete
 **Phase 2 (B2):** ✅ Complete
-**Phase 3 (A3):** ⬜ Not Started
-**Phase 3 (A4):** ⬜ Not Started
-**Phase 3 (B3):** ⬜ Not Started
-**Phase 3 (B4):** ⬜ Not Started
-**Phase 3 (Combined):** ⬜ Not Started
+**Phase 3 (A3):** ✅ Complete
+**Phase 3 (A4):** ✅ Complete
+**Phase 3 (B3):** ✅ Complete
+**Phase 3 (B4):** ✅ Complete
+**Phase 3 (Combined):** ✅ Complete
 **Phase 4:** ⬜ Not Started
 
 ---
@@ -322,7 +314,7 @@ Karisa/
 
 ---
 
-**Last Updated:** 2025-01-24
-**Status:** Ready to begin implementation (Revised)
+**Last Updated:** 2025-01-26
+**Status:** Phase 3 Complete! Only Phase 4 (Final Reporting) remaining.
 
 💖 Let's make this amazing for Karisa! 💖
