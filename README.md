@@ -82,7 +82,8 @@ python super_important_code.py
 ```
 Karisa/
 ├── data/
-│   └── karisa_paper.xlsx          # Your experimental data
+│   ├── AmAc_Tray.xlsx             # Your experimental data
+│   └── karisa_paper.xlsx          # (Original filename)
 ├── eda.py                         # Exploratory data analysis
 ├── utils.py                       # Shared utility functions
 ├── hydraulics_a1_a2.py           # Phase 2: Variable importance (hydraulics)

@@ -254,6 +254,7 @@ For each goal (A1, A2, A3, A4):
 ```
 Karisa/
 ├── data/
+│   ├── AmAc_Tray.xlsx
 │   └── karisa_paper.xlsx
 ├── eda.py (✓ Complete)
 ├── eda_plots/ (✓ Complete)

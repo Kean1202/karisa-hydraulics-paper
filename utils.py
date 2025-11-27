@@ -30,7 +30,7 @@ VALID_VALUES = {
 }
 
 
-def load_data(data_path="data/karisa_paper.xlsx"):
+def load_data(data_path="data/AmAc_Tray.xlsx"):
     """
     Load both datasets from Excel file.
 

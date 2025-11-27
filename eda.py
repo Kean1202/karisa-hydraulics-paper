@@ -14,7 +14,7 @@ plt.rcParams['figure.figsize'] = (12, 8)
 # 💕 Made with love for Karisa 💕
 
 # Load the data
-data_path = Path("data/karisa_paper.xlsx")
+data_path = Path("data/AmAc_Tray.xlsx")
 
 # Read both sheets
 df_full = pd.read_excel(data_path, sheet_name="full_dataset")
@@ -109,6 +109,7 @@ print("\n" + "=" * 80)
 print("5. DEPENDENT VARIABLE DISTRIBUTIONS")
 print("=" * 80)
 
+# Distribution of pass/flood/weep
 print("\n--- Hydraulic Performance (DESC) Distribution [Full Dataset] ---")
 if 'DESC' in df_full.columns:
     desc_counts = df_full['DESC'].value_counts()
@@ -132,6 +133,7 @@ if 'PURITY' in df_pass.columns:
     print(f"Range: [{df_pass['PURITY'].min():.4f}, {df_pass['PURITY'].max():.4f}]")
     print(f"Mean: {df_pass['PURITY'].mean():.4f}")
     print(f"Median: {df_pass['PURITY'].median():.4f}")
+
 
 # STATISTICAL TESTS: ANOVA/Kruskal-Wallis for Independent Variables vs DESC
 print("\n" + "=" * 80)
