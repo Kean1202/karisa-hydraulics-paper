@@ -14,7 +14,7 @@ plt.rcParams['figure.figsize'] = (12, 8)
 # 💕 Made with love for Karisa 💕
 
 # Load the data
-data_path = Path("data/AmAc_Tray.xlsx")
+data_path = Path("data/karisa_paper.xlsx")
 
 # Read both sheets
 df_full = pd.read_excel(data_path, sheet_name="full_dataset")
