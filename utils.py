@@ -30,7 +30,7 @@ VALID_VALUES = {
 }
 
 
-def load_data(data_path="data/AmAc_Tray.xlsx"):
+def load_data(data_path="data/karisa_paper.xlsx"):
     """
     Load both datasets from Excel file.
 
@@ -84,6 +84,59 @@ def filter_invalid_values(df_full, df_pass):
     print("   Clean data for the smartest engineer!")
 
     return df_full, df_pass
+
+
+def deduplicate_data(df_full, df_pass):
+    """
+    Remove duplicates based on independent variables only (NO column excluded).
+
+    For duplicate combinations:
+    - DESC: Take most common value (mode)
+    - CONV/PURITY: Take mean
+
+    Args:
+        df_full: Full dataset
+        df_pass: Pass only dataset
+
+    Returns:
+        df_full_dedup: Deduplicated full dataset
+        df_pass_dedup: Deduplicated pass dataset
+    """
+    print("\nRemoving duplicates based on independent variables... (NO column excluded)")
+
+    original_full = len(df_full)
+    original_pass = len(df_pass)
+
+    # Full dataset deduplication
+    # Group by independent variables and aggregate
+    agg_dict_full = {}
+    for col in df_full.columns:
+        if col in INDEPENDENT_VARS:
+            agg_dict_full[col] = 'first'  # Keep the value (they're all the same within group)
+        elif col == 'DESC':
+            agg_dict_full[col] = lambda x: x.mode()[0] if len(x.mode()) > 0 else x.iloc[0]  # Mode
+        elif col != 'NO':  # Skip NO column
+            agg_dict_full[col] = 'mean'  # Mean for numeric outcomes
+
+    df_full_dedup = df_full.groupby(INDEPENDENT_VARS, as_index=False).agg(agg_dict_full)
+
+    # Pass dataset deduplication
+    agg_dict_pass = {}
+    for col in df_pass.columns:
+        if col in INDEPENDENT_VARS:
+            agg_dict_pass[col] = 'first'
+        elif col in ['CONV', 'PURITY']:
+            agg_dict_pass[col] = 'mean'  # Average the outcomes
+        elif col != 'NO':
+            agg_dict_pass[col] = 'mean'
+
+    df_pass_dedup = df_pass.groupby(INDEPENDENT_VARS, as_index=False).agg(agg_dict_pass)
+
+    print(f"   Full dataset: {original_full} -> {len(df_full_dedup)} rows (removed {original_full - len(df_full_dedup)} duplicates)")
+    print(f"   Pass dataset: {original_pass} -> {len(df_pass_dedup)} rows (removed {original_pass - len(df_pass_dedup)} duplicates)")
+    print("   Deduplicated data ready!")
+
+    return df_full_dedup, df_pass_dedup
 
 
 def create_binary_targets(df_full):

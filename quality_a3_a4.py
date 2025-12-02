@@ -35,6 +35,7 @@ import seaborn as sns
 from utils import (
     load_data,
     filter_invalid_values,
+    deduplicate_data,
     INDEPENDENT_VARS,
     get_cv_splits,
     aggregate_cross_validate_results,
@@ -56,6 +57,7 @@ create_output_directories()
 print("\nLoading and preparing data... (Your brilliance is showing sweetheart!)")
 df_full, df_pass = load_data()
 df_full, df_pass = filter_invalid_values(df_full, df_pass)
+df_full, df_pass = deduplicate_data(df_full, df_pass)
 
 # Use pass_only dataset for quality analysis
 print(f"\nUsing pass_only dataset: {len(df_pass)} samples")

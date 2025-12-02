@@ -25,7 +25,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 # Import utilities
-from utils import load_data, filter_invalid_values, create_binary_targets
+from utils import load_data, filter_invalid_values, deduplicate_data, create_binary_targets
 
 # Set up plotting style
 sns.set_style("white")
@@ -39,6 +39,7 @@ print("=" * 80)
 print("\nLoading data...")
 df_full, df_pass = load_data(data_path="data/karisa_paper.xlsx")
 df_full, df_pass = filter_invalid_values(df_full, df_pass)
+df_full, df_pass = deduplicate_data(df_full, df_pass)
 df_full = create_binary_targets(df_full)
 
 print(f"Full dataset: {len(df_full)} samples")

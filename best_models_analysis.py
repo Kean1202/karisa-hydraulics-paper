@@ -37,6 +37,7 @@ import seaborn as sns
 from utils import (
     load_data,
     filter_invalid_values,
+    deduplicate_data,
     create_binary_targets,
     INDEPENDENT_VARS,
     get_cv_splits,
@@ -55,6 +56,7 @@ print_phase_start("Re-analyzing with Best Models: RF & XGB")
 print("\nLoading and preparing data...")
 df_full, df_pass = load_data()
 df_full, df_pass = filter_invalid_values(df_full, df_pass)
+df_full, df_pass = deduplicate_data(df_full, df_pass)
 df_full = create_binary_targets(df_full)
 
 # Prepare features for hydraulics (full dataset)

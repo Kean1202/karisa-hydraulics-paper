@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Intention Diagrams - Variable Pair Interactions for All Targets
+Interaction Diagrams - Variable Pair Interactions for All Targets
 
 Creates interaction plots showing how the most influential variable pairs
 affect each target outcome:
 - HYDRAULIC FAILURES (WEEP + FLOOD): Top 5 variables (HDIAM, NHOLES, DIAM, WEIRHT, TRAYSPC)
+  Includes decision boundary lines showing class separation regions
 - CONVERSION: Top 4 variables (DIAM, WEIRHT, NPASS, TRAYSPC)
 - PURITY: Top 4 variables (DIAM, WEIRHT, NPASS, TRAYSPC)
 
@@ -22,8 +23,10 @@ from pathlib import Path
 import warnings
 warnings.filterwarnings('ignore')
 
+from xgboost import XGBClassifier
+
 # Import utilities
-from utils import load_data, filter_invalid_values, create_binary_targets
+from utils import load_data, filter_invalid_values, deduplicate_data, create_binary_targets
 
 # Set up plotting style
 sns.set_style("whitegrid")
@@ -48,13 +51,14 @@ print("=" * 80)
 print("\nLoading data...")
 df_full, df_pass = load_data(data_path="data/karisa_paper.xlsx")
 df_full, df_pass = filter_invalid_values(df_full, df_pass)
+df_full, df_pass = deduplicate_data(df_full, df_pass)
 df_full = create_binary_targets(df_full)
 
 print(f"Full dataset: {len(df_full)} samples")
 print(f"Pass dataset: {len(df_pass)} samples")
 
 # Create output directory
-output_dir = Path("results/intention_diagrams")
+output_dir = Path("results/interaction_diagrams")
 output_dir.mkdir(parents=True, exist_ok=True)
 
 # ===================================================================
@@ -119,6 +123,37 @@ for idx, (var1, var2) in enumerate(hydraulic_pairs):
         s=30,
         ax=ax
     )
+
+    # Add decision boundary lines
+    # Train XGBoost on just these 2 variables
+    X_pair = df_full[[var1, var2]].values
+    y_desc = df_full['DESC'].map({'PASS': 0, 'WEEP': 1, 'FLOOD': 2}).values
+
+    clf = XGBClassifier(n_estimators=50, max_depth=4, random_state=42, verbosity=0)
+    clf.fit(X_pair, y_desc)
+
+    # Create meshgrid for decision boundaries
+    x_min, x_max = X_pair[:, 0].min(), X_pair[:, 0].max()
+    y_min, y_max = X_pair[:, 1].min(), X_pair[:, 1].max()
+
+    # Add small padding
+    x_padding = (x_max - x_min) * 0.02
+    y_padding = (y_max - y_min) * 0.02
+
+    xx, yy = np.meshgrid(
+        np.linspace(x_min - x_padding, x_max + x_padding, 200),
+        np.linspace(y_min - y_padding, y_max + y_padding, 200)
+    )
+
+    # Predict on meshgrid
+    Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
+    Z = Z.reshape(xx.shape)
+
+    # Draw decision boundaries with colored lines
+    # Contour lines at class boundaries (where prediction changes)
+    # Use DESC_COLORS: WEEP orange for PASS/WEEP boundary, FLOOD purple for WEEP/FLOOD boundary
+    ax.contour(xx, yy, Z, levels=[0.5, 1.5], colors=[DESC_COLORS['WEEP'], DESC_COLORS['FLOOD']],
+               linewidths=0.8, linestyles='--', alpha=0.6)
 
     ax.set_xlabel(var1, fontsize=11, fontweight='bold')
     ax.set_ylabel(var2, fontsize=11, fontweight='bold')

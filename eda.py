@@ -43,6 +43,44 @@ for var, valid_vals in VALID_VALUES.items():
 if 'DESC' in df_full.columns:
     df_full['DESC'].fillna("FLOOD", inplace=True)
 
+# Remove duplicates based on independent variables (NO column excluded)
+print("\n" + "=" * 80)
+print("REMOVING DUPLICATES")
+print("=" * 80)
+print("Grouping by independent variables only (NO column excluded)...")
+
+independent_vars = ['NHOLES', 'HDIAM', 'TRAYSPC', 'WEIRHT', 'DECK', 'DIAM', 'NPASS']
+original_full = len(df_full)
+original_pass = len(df_pass)
+
+# Full dataset deduplication
+agg_dict_full = {}
+for col in df_full.columns:
+    if col in independent_vars:
+        agg_dict_full[col] = 'first'
+    elif col == 'DESC':
+        agg_dict_full[col] = lambda x: x.mode()[0] if len(x.mode()) > 0 else x.iloc[0]
+    elif col != 'NO':
+        agg_dict_full[col] = 'mean'
+
+df_full = df_full.groupby(independent_vars, as_index=False).agg(agg_dict_full)
+
+# Pass dataset deduplication
+agg_dict_pass = {}
+for col in df_pass.columns:
+    if col in independent_vars:
+        agg_dict_pass[col] = 'first'
+    elif col in ['CONV', 'PURITY']:
+        agg_dict_pass[col] = 'mean'
+    elif col != 'NO':
+        agg_dict_pass[col] = 'mean'
+
+df_pass = df_pass.groupby(independent_vars, as_index=False).agg(agg_dict_pass)
+
+print(f"Full dataset: {original_full} -> {len(df_full)} rows (removed {original_full - len(df_full)} duplicates)")
+print(f"Pass dataset: {original_pass} -> {len(df_pass)} rows (removed {original_pass - len(df_pass)} duplicates)")
+print("Deduplicated data ready for EDA!")
+
 print("=" * 80)
 print("EXPLORATORY DATA ANALYSIS - I LOVE YOU KARISA ❤️")
 print("=" * 80)
