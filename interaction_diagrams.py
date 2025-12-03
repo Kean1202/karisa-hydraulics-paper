@@ -29,16 +29,17 @@ from utils import load_data, filter_invalid_values, deduplicate_data, create_bin
 # Set up plotting style
 sns.set_style("whitegrid")
 
-# Colorblind-friendly palettes
-# For categorical DESC: use colorblind-safe colors
+# Use magma colormap
+import matplotlib.cm as cm
+magma_cmap = cm.get_cmap('magma')
 DESC_COLORS = {
-    'PASS': '#0173B2',    # Blue
-    'WEEP': '#DE8F05',    # Orange
-    'FLOOD': '#CC78BC'    # Purple/Pink
+    'PASS': magma_cmap(0.2),
+    'WEEP': magma_cmap(0.5),
+    'FLOOD': magma_cmap(0.9)
 }
 
-# For continuous: viridis is already colorblind-friendly
-CONTINUOUS_CMAP = 'viridis'
+# For continuous: use magma
+CONTINUOUS_CMAP = 'magma'
 
 print("=" * 80)
 print("INTENTION DIAGRAMS - Critical Variable Pair Interactions")

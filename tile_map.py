@@ -117,7 +117,7 @@ for idx, (var1, var2) in enumerate(hydraulic_pairs):
 
         # Use pcolormesh with no interpolation
         im = ax.pcolormesh(x_edges, y_edges, pivot.values,
-                          cmap='RdYlGn_r', vmin=0, vmax=100,
+                          cmap='magma', vmin=0, vmax=100,
                           shading='flat', edgecolors='white', linewidth=0.5)
 
         # Set ticks to center of each cell
@@ -176,7 +176,7 @@ for idx, (var1, var2) in enumerate(conversion_pairs):
 
         # Use pcolormesh with no interpolation
         im = ax.pcolormesh(x_edges, y_edges, pivot.values,
-                          cmap='viridis',
+                          cmap='magma',
                           shading='flat', edgecolors='white', linewidth=0.5)
 
         # Set ticks to center of each cell
@@ -232,7 +232,7 @@ for idx, (var1, var2) in enumerate(purity_pairs):
 
         # Use pcolormesh with no interpolation
         im = ax.pcolormesh(x_edges, y_edges, pivot.values,
-                          cmap='viridis',
+                          cmap='magma',
                           shading='flat', edgecolors='white', linewidth=0.5)
 
         # Set ticks to center of each cell

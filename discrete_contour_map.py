@@ -118,11 +118,11 @@ for idx, (var1, var2) in enumerate(hydraulic_pairs):
 
         # Filled contour plot (no interpolation beyond grid)
         contourf = ax.contourf(X, Y, pivot.values, levels=levels,
-                               cmap='RdYlGn_r', alpha=0.8, extend='neither')
+                               cmap='magma', alpha=0.8, extend='neither')
 
         # Contour lines
         contour = ax.contour(X, Y, pivot.values, levels=levels,
-                            colors='black', linewidths=1.5, alpha=0.6)
+                            colors='white', linewidths=1.5, alpha=0.6)
         ax.clabel(contour, inline=True, fontsize=8, fmt='%.0f%%')
 
         # Overlay discrete grid (light gray boundaries)
@@ -192,11 +192,11 @@ for idx, (var1, var2) in enumerate(conversion_pairs):
 
         # Filled contour plot
         contourf = ax.contourf(X, Y, pivot.values, levels=levels,
-                               cmap='viridis', alpha=0.8, extend='neither')
+                               cmap='magma', alpha=0.8, extend='neither')
 
         # Contour lines
         contour = ax.contour(X, Y, pivot.values, levels=levels,
-                            colors='black', linewidths=1.5, alpha=0.6)
+                            colors='white', linewidths=1.5, alpha=0.6)
         ax.clabel(contour, inline=True, fontsize=8, fmt='%.4f')
 
         # Overlay discrete grid
@@ -263,11 +263,11 @@ for idx, (var1, var2) in enumerate(purity_pairs):
 
         # Filled contour plot
         contourf = ax.contourf(X, Y, pivot.values, levels=levels,
-                               cmap='viridis', alpha=0.8, extend='neither')
+                               cmap='magma', alpha=0.8, extend='neither')
 
         # Contour lines
         contour = ax.contour(X, Y, pivot.values, levels=levels,
-                            colors='black', linewidths=1.5, alpha=0.6)
+                            colors='white', linewidths=1.5, alpha=0.6)
         ax.clabel(contour, inline=True, fontsize=8, fmt='%.4f')
 
         # Overlay discrete grid
