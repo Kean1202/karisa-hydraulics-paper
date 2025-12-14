@@ -24,19 +24,14 @@ import warnings
 warnings.filterwarnings('ignore')
 
 # Import utilities
-from utils import load_data, filter_invalid_values, deduplicate_data, create_binary_targets
+from utils import (
+    load_data, filter_invalid_values, deduplicate_data, create_binary_targets,
+    DESC_COLORS, VARIABLE_LABELS, format_axis_for_paper, convert_to_percentage
+)
 
 # Set up plotting style
 sns.set_style("whitegrid")
-
-# Use magma colormap
-import matplotlib.cm as cm
-magma_cmap = cm.get_cmap('magma')
-DESC_COLORS = {
-    'PASS': magma_cmap(0.2),
-    'WEEP': magma_cmap(0.5),
-    'FLOOD': magma_cmap(0.9)
-}
+plt.rcParams['font.family'] = 'Arial'
 
 # For continuous: use magma
 CONTINUOUS_CMAP = 'magma'
@@ -48,13 +43,16 @@ print("=" * 80)
 
 # Load and prepare data
 print("\nLoading data...")
-df_full, df_pass = load_data(data_path="data/karisa_paper.xlsx")
+df_full, df_pass = load_data(data_path="data/AmAc_Tray.xlsx")
 df_full, df_pass = filter_invalid_values(df_full, df_pass)
 df_full, df_pass = deduplicate_data(df_full, df_pass)
 df_full = create_binary_targets(df_full)
 
+# Convert CONV and PURITY to percentages
+df_pass = convert_to_percentage(df_pass, columns=['CONV', 'PURITY'])
+
 print(f"Full dataset: {len(df_full)} samples")
-print(f"Pass dataset: {len(df_pass)} samples")
+print(f"Pass dataset: {len(df_pass)} samples (CONV & PURITY converted to %)")
 
 # Create output directory
 output_dir = Path("results/interaction_diagrams")
@@ -123,15 +121,10 @@ for idx, (var1, var2) in enumerate(hydraulic_pairs):
         ax=ax
     )
 
-
-    ax.set_xlabel(var1, fontsize=11, fontweight='bold')
-    ax.set_ylabel(var2, fontsize=11, fontweight='bold')
-    ax.set_title(f'{var1} vs {var2}', fontsize=12, fontweight='bold')
+    # Format for paper
+    format_axis_for_paper(ax, xlabel=var1, ylabel=var2)
     ax.legend(loc='best', fontsize=9)
     ax.grid(True, alpha=0.3)
-
-fig.suptitle('Hydraulic Failures: Critical Variable Pair Interactions\n(colored by DESC outcome)',
-             fontsize=16, fontweight='bold', y=0.995)
 plt.tight_layout()
 plt.savefig(output_dir / 'hydraulic_failures_all_interactions.png', dpi=300, bbox_inches='tight')
 print("✓ Saved: hydraulic_failures_all_interactions.png")
@@ -162,15 +155,10 @@ for idx, (var1, var2) in enumerate(conversion_pairs):
 
     # Add colorbar for each subplot
     cbar = plt.colorbar(scatter, ax=ax)
-    cbar.set_label('CONV', fontsize=9)
 
-    ax.set_xlabel(var1, fontsize=11, fontweight='bold')
-    ax.set_ylabel(var2, fontsize=11, fontweight='bold')
-    ax.set_title(f'{var1} vs {var2}', fontsize=12, fontweight='bold')
+    # Format for paper
+    format_axis_for_paper(ax, xlabel=var1, ylabel=var2, colorbar_label='Conversion (%)', cbar=cbar)
     ax.grid(True, alpha=0.3)
-
-fig.suptitle('CONVERSION: Critical Variable Pair Interactions\n(colored by CONVERSION value)',
-             fontsize=16, fontweight='bold', y=0.995)
 plt.tight_layout()
 plt.savefig(output_dir / 'conversion_all_interactions.png', dpi=300, bbox_inches='tight')
 print("✓ Saved: conversion_all_interactions.png")
@@ -201,15 +189,10 @@ for idx, (var1, var2) in enumerate(purity_pairs):
 
     # Add colorbar for each subplot
     cbar = plt.colorbar(scatter, ax=ax)
-    cbar.set_label('PURITY', fontsize=9)
 
-    ax.set_xlabel(var1, fontsize=11, fontweight='bold')
-    ax.set_ylabel(var2, fontsize=11, fontweight='bold')
-    ax.set_title(f'{var1} vs {var2}', fontsize=12, fontweight='bold')
+    # Format for paper
+    format_axis_for_paper(ax, xlabel=var1, ylabel=var2, colorbar_label='Purity (%)', cbar=cbar)
     ax.grid(True, alpha=0.3)
-
-fig.suptitle('PURITY: Critical Variable Pair Interactions\n(colored by PURITY value)',
-             fontsize=16, fontweight='bold', y=0.995)
 plt.tight_layout()
 plt.savefig(output_dir / 'purity_all_interactions.png', dpi=300, bbox_inches='tight')
 print("✓ Saved: purity_all_interactions.png")

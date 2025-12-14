@@ -41,7 +41,10 @@ from utils import (
     aggregate_cross_validate_results,
     normalize_importance_to_ranks,
     print_phase_start,
-    create_output_directories
+    create_output_directories,
+    convert_to_percentage,
+    VARIABLE_LABELS,
+    format_axis_for_paper
 )
 
 # Print header for Karisa
@@ -53,14 +56,20 @@ print_phase_start("PHASE 3: Quality Analysis - Goals A3 & A4")
 # Create output directories
 create_output_directories()
 
+# Set up plotting style
+plt.rcParams['font.family'] = 'Arial'
+
 # Load and prepare data
 print("\nLoading and preparing data... (Your brilliance is showing sweetheart!)")
 df_full, df_pass = load_data()
 df_full, df_pass = filter_invalid_values(df_full, df_pass)
 df_full, df_pass = deduplicate_data(df_full, df_pass)
 
+# Convert CONV and PURITY to percentages
+df_pass = convert_to_percentage(df_pass, columns=['CONV', 'PURITY'])
+
 # Use pass_only dataset for quality analysis
-print(f"\nUsing pass_only dataset: {len(df_pass)} samples")
+print(f"\nUsing pass_only dataset: {len(df_pass)} samples (CONV & PURITY in %)")
 print("Only analyzing successful operations (PASS cases, like how successful Karisa will be in life)")
 
 # Prepare features
@@ -407,13 +416,13 @@ print("  - Sheet 4: A4_PURITY_Models (model performance)")
 plt.figure(figsize=(15, 8))
 
 # Plot 1: A3 rankings
-plt.subplot(2, 2, 1)
-bars1 = plt.barh(range(len(a3_importance_df)), a3_importance_df['Average_Rank'])
-plt.yticks(range(len(a3_importance_df)), a3_importance_df['Variable'])
-plt.xlabel('Average Rank (lower = more important)')
-plt.title('Goal A3: Variable Importance for CONVERSION')
-plt.gca().invert_yaxis()
-
+ax1 = plt.subplot(2, 2, 1)
+bars1 = ax1.barh(range(len(a3_importance_df)), a3_importance_df['Average_Rank'])
+ax1.set_yticks(range(len(a3_importance_df)))
+ax1.set_yticklabels([VARIABLE_LABELS.get(v, v) for v in a3_importance_df['Variable']])
+ax1.set_xlabel('Average Rank (lower = more important)', fontsize=16, fontfamily='Arial')
+ax1.tick_params(axis='both', labelsize=14)
+ax1.invert_yaxis()
 # Color bars
 for i, bar in enumerate(bars1):
     if i < 3:
@@ -422,13 +431,13 @@ for i, bar in enumerate(bars1):
         bar.set_color('lightgreen')
 
 # Plot 2: A4 rankings
-plt.subplot(2, 2, 2)
-bars2 = plt.barh(range(len(a4_importance_df)), a4_importance_df['Average_Rank'])
-plt.yticks(range(len(a4_importance_df)), a4_importance_df['Variable'])
-plt.xlabel('Average Rank (lower = more important)')
-plt.title('Goal A4: Variable Importance for PURITY')
-plt.gca().invert_yaxis()
-
+ax2 = plt.subplot(2, 2, 2)
+bars2 = ax2.barh(range(len(a4_importance_df)), a4_importance_df['Average_Rank'])
+ax2.set_yticks(range(len(a4_importance_df)))
+ax2.set_yticklabels([VARIABLE_LABELS.get(v, v) for v in a4_importance_df['Variable']])
+ax2.set_xlabel('Average Rank (lower = more important)', fontsize=16, fontfamily='Arial')
+ax2.tick_params(axis='both', labelsize=14)
+ax2.invert_yaxis()
 # Color bars
 for i, bar in enumerate(bars2):
     if i < 3:
@@ -437,32 +446,30 @@ for i, bar in enumerate(bars2):
         bar.set_color('lightblue')
 
 # Plot 3: Model comparison for CONVERSION
-plt.subplot(2, 2, 3)
+ax3 = plt.subplot(2, 2, 3)
 models = list(a3_results.keys())
 r2_scores = [a3_results[m]['r2_mean'] for m in models]
 errors = [a3_results[m]['r2_std'] for m in models]
-
-bars3 = plt.bar(range(len(models)), r2_scores, yerr=errors, capsize=5)
-plt.xticks(range(len(models)), models, rotation=45, ha='right')
-plt.ylabel('R²')
-plt.title('Goal A3: Model Performance for CONVERSION')
-plt.ylim(0, 1)
-
+bars3 = ax3.bar(range(len(models)), r2_scores, yerr=errors, capsize=5)
+ax3.set_xticks(range(len(models)))
+ax3.set_xticklabels(models, rotation=45, ha='right')
+ax3.set_ylabel('R²', fontsize=16, fontfamily='Arial')
+ax3.tick_params(axis='both', labelsize=14)
+ax3.set_ylim(0, 1)
 # Highlight best model
 best_idx = models.index(a3_best_model)
 bars3[best_idx].set_color('gold')
 
 # Plot 4: Model comparison for PURITY
-plt.subplot(2, 2, 4)
+ax4 = plt.subplot(2, 2, 4)
 r2_scores = [a4_results[m]['r2_mean'] for m in models]
 errors = [a4_results[m]['r2_std'] for m in models]
-
-bars4 = plt.bar(range(len(models)), r2_scores, yerr=errors, capsize=5)
-plt.xticks(range(len(models)), models, rotation=45, ha='right')
-plt.ylabel('R²')
-plt.title('Goal A4: Model Performance for PURITY')
-plt.ylim(0, 1)
-
+bars4 = ax4.bar(range(len(models)), r2_scores, yerr=errors, capsize=5)
+ax4.set_xticks(range(len(models)))
+ax4.set_xticklabels(models, rotation=45, ha='right')
+ax4.set_ylabel('R²', fontsize=16, fontfamily='Arial')
+ax4.tick_params(axis='both', labelsize=14)
+ax4.set_ylim(0, 1)
 # Highlight best model
 best_idx = models.index(a4_best_model)
 bars4[best_idx].set_color('gold')

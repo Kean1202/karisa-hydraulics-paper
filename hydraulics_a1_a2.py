@@ -46,7 +46,9 @@ from utils import (
     save_importance_ranking,
     save_model_comparison,
     print_phase_start,
-    create_output_directories
+    create_output_directories,
+    VARIABLE_LABELS,
+    format_axis_for_paper
 )
 
 # Print header for Karisa
@@ -57,6 +59,9 @@ print_phase_start("PHASE 2: Hydraulic Behavior Analysis - Goals A1 & A2")
 
 # Create output directories
 create_output_directories()
+
+# Set up plotting style
+plt.rcParams['font.family'] = 'Arial'
 
 # Load and prepare data
 # I also load the pass-only dataset here because the function returns both and I cant leave it unassigned
@@ -406,18 +411,18 @@ print("=" * 80)
 plt.figure(figsize=(15, 8))
 
 # Plot 1: A1 rankings
-plt.subplot(2, 2, 1)
+ax1 = plt.subplot(2, 2, 1)
 a1_df_plot = pd.DataFrame({
     'Variable': INDEPENDENT_VARS,
     'Rank': a1_avg_ranks
 }).sort_values('Rank')
 
-bars1 = plt.barh(range(len(a1_df_plot)), a1_df_plot['Rank'])
-plt.yticks(range(len(a1_df_plot)), a1_df_plot['Variable'])
-plt.xlabel('Average Rank (lower = more important)')
-plt.title('Goal A1: Variable Importance for WEEP')
-plt.gca().invert_yaxis()
-
+bars1 = ax1.barh(range(len(a1_df_plot)), a1_df_plot['Rank'])
+ax1.set_yticks(range(len(a1_df_plot)))
+ax1.set_yticklabels([VARIABLE_LABELS.get(v, v) for v in a1_df_plot['Variable']])
+ax1.set_xlabel('Average Rank (lower = more important)', fontsize=16, fontfamily='Arial')
+ax1.tick_params(axis='both', labelsize=14)
+ax1.invert_yaxis()
 # Color bars
 for i, bar in enumerate(bars1):
     if i < 3:
@@ -426,18 +431,18 @@ for i, bar in enumerate(bars1):
         bar.set_color('lightcoral')
 
 # Plot 2: A2 rankings
-plt.subplot(2, 2, 2)
+ax2 = plt.subplot(2, 2, 2)
 a2_df_plot = pd.DataFrame({
     'Variable': INDEPENDENT_VARS,
     'Rank': a2_avg_ranks
 }).sort_values('Rank')
 
-bars2 = plt.barh(range(len(a2_df_plot)), a2_df_plot['Rank'])
-plt.yticks(range(len(a2_df_plot)), a2_df_plot['Variable'])
-plt.xlabel('Average Rank (lower = more important)')
-plt.title('Goal A2: Variable Importance for FLOOD')
-plt.gca().invert_yaxis()
-
+bars2 = ax2.barh(range(len(a2_df_plot)), a2_df_plot['Rank'])
+ax2.set_yticks(range(len(a2_df_plot)))
+ax2.set_yticklabels([VARIABLE_LABELS.get(v, v) for v in a2_df_plot['Variable']])
+ax2.set_xlabel('Average Rank (lower = more important)', fontsize=16, fontfamily='Arial')
+ax2.tick_params(axis='both', labelsize=14)
+ax2.invert_yaxis()
 # Color bars
 for i, bar in enumerate(bars2):
     if i < 3:
@@ -446,32 +451,30 @@ for i, bar in enumerate(bars2):
         bar.set_color('lightblue')
 
 # Plot 3: Model comparison for WEEP
-plt.subplot(2, 2, 3)
+ax3 = plt.subplot(2, 2, 3)
 models = list(a1_results.keys())
 roc_aucs = [a1_results[m]['roc_auc_mean'] for m in models]
 errors = [a1_results[m]['roc_auc_std'] for m in models]
-
-bars3 = plt.bar(range(len(models)), roc_aucs, yerr=errors, capsize=5)
-plt.xticks(range(len(models)), models, rotation=45, ha='right')
-plt.ylabel('ROC-AUC')
-plt.title('Goal A1: Model Performance for WEEP')
-plt.ylim(0, 1)
-
+bars3 = ax3.bar(range(len(models)), roc_aucs, yerr=errors, capsize=5)
+ax3.set_xticks(range(len(models)))
+ax3.set_xticklabels(models, rotation=45, ha='right')
+ax3.set_ylabel('ROC-AUC', fontsize=16, fontfamily='Arial')
+ax3.tick_params(axis='both', labelsize=14)
+ax3.set_ylim(0, 1)
 # Highlight best model
 best_idx = models.index(a1_best_model)
 bars3[best_idx].set_color('gold')
 
 # Plot 4: Model comparison for FLOOD
-plt.subplot(2, 2, 4)
+ax4 = plt.subplot(2, 2, 4)
 roc_aucs = [a2_results[m]['roc_auc_mean'] for m in models]
 errors = [a2_results[m]['roc_auc_std'] for m in models]
-
-bars4 = plt.bar(range(len(models)), roc_aucs, yerr=errors, capsize=5)
-plt.xticks(range(len(models)), models, rotation=45, ha='right')
-plt.ylabel('ROC-AUC')
-plt.title('Goal A2: Model Performance for FLOOD')
-plt.ylim(0, 1)
-
+bars4 = ax4.bar(range(len(models)), roc_aucs, yerr=errors, capsize=5)
+ax4.set_xticks(range(len(models)))
+ax4.set_xticklabels(models, rotation=45, ha='right')
+ax4.set_ylabel('ROC-AUC', fontsize=16, fontfamily='Arial')
+ax4.tick_params(axis='both', labelsize=14)
+ax4.set_ylim(0, 1)
 # Highlight best model
 best_idx = models.index(a2_best_model)
 bars4[best_idx].set_color('gold')

@@ -42,7 +42,10 @@ from utils import (
     INDEPENDENT_VARS,
     get_cv_splits,
     normalize_importance_to_ranks,
-    print_phase_start
+    print_phase_start,
+    convert_to_percentage,
+    VARIABLE_LABELS,
+    format_axis_for_paper
 )
 
 # Print header for Karisa
@@ -52,12 +55,18 @@ print("Using only the champions, just like Karisa!")
 print("=" * 80)
 print_phase_start("Re-analyzing with Best Models: RF & XGB")
 
+# Set up plotting style
+plt.rcParams['font.family'] = 'Arial'
+
 # Load and prepare data
 print("\nLoading and preparing data...")
 df_full, df_pass = load_data()
 df_full, df_pass = filter_invalid_values(df_full, df_pass)
 df_full, df_pass = deduplicate_data(df_full, df_pass)
 df_full = create_binary_targets(df_full)
+
+# Convert CONV and PURITY to percentages
+df_pass = convert_to_percentage(df_pass, columns=['CONV', 'PURITY'])
 
 # Prepare features for hydraulics (full dataset)
 X_full = df_full[INDEPENDENT_VARS]
@@ -426,109 +435,138 @@ print(f"\n✓ Results saved to: {output_excel}")
 print("  - 8 sheets total (importance + models for each goal)")
 
 # ===================================================================
-# CREATE COMPREHENSIVE VISUALIZATION
+# CREATE INDIVIDUAL VISUALIZATIONS
 # ===================================================================
 print("\n" + "=" * 80)
-print("Creating visualizations...")
+print("Creating individual visualizations...")
 print("=" * 80)
 
-fig = plt.figure(figsize=(18, 12))
+# Create output directory
+from pathlib import Path
+output_dir = Path("results/best_model")
+output_dir.mkdir(parents=True, exist_ok=True)
 
-# A1: WEEP importance
-ax1 = plt.subplot(2, 4, 1)
-bars = ax1.barh(range(len(a1_importance_df)), a1_importance_df['Average_Rank'])
-ax1.set_yticks(range(len(a1_importance_df)))
-ax1.set_yticklabels(a1_importance_df['Variable'])
-ax1.set_xlabel('Average Rank (lower = more important)')
-ax1.set_title('A1: WEEP Variable Importance\n(RF & XGB)', fontweight='bold')
-ax1.invert_yaxis()
-for i, bar in enumerate(bars):
-    bar.set_color('darkred' if i < 3 else 'lightcoral')
+# ===================================================================
+# A1: WEEP IMPORTANCE (RF & XGB separately)
+# ===================================================================
+fig, ax = plt.subplots(figsize=(10, 6))
 
-# A1: Model comparison
-ax2 = plt.subplot(2, 4, 2)
-models = a1_comparison_df['Model'].tolist()
-roc_aucs = a1_comparison_df['roc_auc_mean'].tolist()
-errors = a1_comparison_df['roc_auc_std'].tolist()
-ax2.bar(range(len(models)), roc_aucs, yerr=errors, capsize=5, color=['forestgreen', 'darkorange'])
-ax2.set_xticks(range(len(models)))
-ax2.set_xticklabels(models, rotation=45, ha='right')
-ax2.set_ylabel('ROC-AUC')
-ax2.set_title('A1: Model Performance (WEEP)', fontweight='bold')
-ax2.set_ylim(0, 1)
+# Prepare data
+variables = [VARIABLE_LABELS.get(v, v) for v in a1_importance_df['Variable']]
+rf_scores = a1_importance_df['RF_Importance'].values
+xgb_scores = a1_importance_df['XGB_Importance'].values
 
-# A2: FLOOD importance
-ax3 = plt.subplot(2, 4, 3)
-bars = ax3.barh(range(len(a2_importance_df)), a2_importance_df['Average_Rank'])
-ax3.set_yticks(range(len(a2_importance_df)))
-ax3.set_yticklabels(a2_importance_df['Variable'])
-ax3.set_xlabel('Average Rank (lower = more important)')
-ax3.set_title('A2: FLOOD Variable Importance\n(RF & XGB)', fontweight='bold')
-ax3.invert_yaxis()
-for i, bar in enumerate(bars):
-    bar.set_color('darkblue' if i < 3 else 'lightblue')
+# Set up bar positions
+y_pos = np.arange(len(variables))
+bar_height = 0.35
 
-# A2: Model comparison
-ax4 = plt.subplot(2, 4, 4)
-models = a2_comparison_df['Model'].tolist()
-roc_aucs = a2_comparison_df['roc_auc_mean'].tolist()
-errors = a2_comparison_df['roc_auc_std'].tolist()
-ax4.bar(range(len(models)), roc_aucs, yerr=errors, capsize=5, color=['forestgreen', 'darkorange'])
-ax4.set_xticks(range(len(models)))
-ax4.set_xticklabels(models, rotation=45, ha='right')
-ax4.set_ylabel('ROC-AUC')
-ax4.set_title('A2: Model Performance (FLOOD)', fontweight='bold')
-ax4.set_ylim(0, 1)
+# Create grouped horizontal bars
+bars1 = ax.barh(y_pos - bar_height/2, rf_scores, bar_height, label='Random Forest', color='forestgreen')
+bars2 = ax.barh(y_pos + bar_height/2, xgb_scores, bar_height, label='XGBoost', color='darkorange')
 
-# A3: CONVERSION importance
-ax5 = plt.subplot(2, 4, 5)
-bars = ax5.barh(range(len(a3_importance_df)), a3_importance_df['Average_Rank'])
-ax5.set_yticks(range(len(a3_importance_df)))
-ax5.set_yticklabels(a3_importance_df['Variable'])
-ax5.set_xlabel('Average Rank (lower = more important)')
-ax5.set_title('A3: CONVERSION Variable Importance\n(RF & XGB)', fontweight='bold')
-ax5.invert_yaxis()
-for i, bar in enumerate(bars):
-    bar.set_color('darkgreen' if i < 3 else 'lightgreen')
-
-# A3: Model comparison
-ax6 = plt.subplot(2, 4, 6)
-models = a3_comparison_df['Model'].tolist()
-r2_scores = a3_comparison_df['r2_mean'].tolist()
-errors = a3_comparison_df['r2_std'].tolist()
-ax6.bar(range(len(models)), r2_scores, yerr=errors, capsize=5, color=['forestgreen', 'darkorange'])
-ax6.set_xticks(range(len(models)))
-ax6.set_xticklabels(models, rotation=45, ha='right')
-ax6.set_ylabel('R²')
-ax6.set_title('A3: Model Performance (CONV)', fontweight='bold')
-ax6.set_ylim(0, 1)
-
-# A4: PURITY importance
-ax7 = plt.subplot(2, 4, 7)
-bars = ax7.barh(range(len(a4_importance_df)), a4_importance_df['Average_Rank'])
-ax7.set_yticks(range(len(a4_importance_df)))
-ax7.set_yticklabels(a4_importance_df['Variable'])
-ax7.set_xlabel('Average Rank (lower = more important)')
-ax7.set_title('A4: PURITY Variable Importance\n(RF & XGB)', fontweight='bold')
-ax7.invert_yaxis()
-for i, bar in enumerate(bars):
-    bar.set_color('purple' if i < 3 else 'plum')
-
-# A4: Model comparison
-ax8 = plt.subplot(2, 4, 8)
-models = a4_comparison_df['Model'].tolist()
-r2_scores = a4_comparison_df['r2_mean'].tolist()
-errors = a4_comparison_df['r2_std'].tolist()
-ax8.bar(range(len(models)), r2_scores, yerr=errors, capsize=5, color=['forestgreen', 'darkorange'])
-ax8.set_xticks(range(len(models)))
-ax8.set_xticklabels(models, rotation=45, ha='right')
-ax8.set_ylabel('R²')
-ax8.set_title('A4: Model Performance (PURITY)', fontweight='bold')
-ax8.set_ylim(0, 1)
+ax.set_yticks(y_pos)
+ax.set_yticklabels(variables)
+ax.set_xlabel('Importance Score', fontsize=16, fontfamily='Arial')
+ax.tick_params(axis='both', labelsize=14)
+ax.invert_yaxis()
+ax.legend(fontsize=12, framealpha=0.9)
 
 plt.tight_layout()
-plt.savefig('results/Best_Models_Complete_Summary.png', dpi=300, bbox_inches='tight')
-print("\n✓ Visualization saved to: results/Best_Models_Complete_Summary.png")
+plt.savefig(output_dir / 'A1_WEEP_Importance.png', dpi=300, bbox_inches='tight')
+plt.close()
+print("✓ Saved: A1_WEEP_Importance.png")
+
+# ===================================================================
+# A2: FLOOD IMPORTANCE (RF & XGB separately)
+# ===================================================================
+fig, ax = plt.subplots(figsize=(10, 6))
+
+# Prepare data
+variables = [VARIABLE_LABELS.get(v, v) for v in a2_importance_df['Variable']]
+rf_scores = a2_importance_df['RF_Importance'].values
+xgb_scores = a2_importance_df['XGB_Importance'].values
+
+# Set up bar positions
+y_pos = np.arange(len(variables))
+bar_height = 0.35
+
+# Create grouped horizontal bars
+bars1 = ax.barh(y_pos - bar_height/2, rf_scores, bar_height, label='Random Forest', color='forestgreen')
+bars2 = ax.barh(y_pos + bar_height/2, xgb_scores, bar_height, label='XGBoost', color='darkorange')
+
+ax.set_yticks(y_pos)
+ax.set_yticklabels(variables)
+ax.set_xlabel('Importance Score', fontsize=16, fontfamily='Arial')
+ax.tick_params(axis='both', labelsize=14)
+ax.invert_yaxis()
+ax.legend(fontsize=12, framealpha=0.9)
+
+plt.tight_layout()
+plt.savefig(output_dir / 'A2_FLOOD_Importance.png', dpi=300, bbox_inches='tight')
+plt.close()
+print("✓ Saved: A2_FLOOD_Importance.png")
+
+# ===================================================================
+# A3: CONVERSION IMPORTANCE (RF & XGB separately)
+# ===================================================================
+fig, ax = plt.subplots(figsize=(10, 6))
+
+# Prepare data
+variables = [VARIABLE_LABELS.get(v, v) for v in a3_importance_df['Variable']]
+rf_scores = a3_importance_df['RF_Importance'].values
+xgb_scores = a3_importance_df['XGB_Importance'].values
+
+# Set up bar positions
+y_pos = np.arange(len(variables))
+bar_height = 0.35
+
+# Create grouped horizontal bars
+bars1 = ax.barh(y_pos - bar_height/2, rf_scores, bar_height, label='Random Forest', color='forestgreen')
+bars2 = ax.barh(y_pos + bar_height/2, xgb_scores, bar_height, label='XGBoost', color='darkorange')
+
+ax.set_yticks(y_pos)
+ax.set_yticklabels(variables)
+ax.set_xlabel('Importance Score', fontsize=16, fontfamily='Arial')
+ax.tick_params(axis='both', labelsize=14)
+ax.invert_yaxis()
+ax.legend(fontsize=12, framealpha=0.9)
+
+plt.tight_layout()
+plt.savefig(output_dir / 'A3_CONV_Importance.png', dpi=300, bbox_inches='tight')
+plt.close()
+print("✓ Saved: A3_CONV_Importance.png")
+
+# ===================================================================
+# A4: PURITY IMPORTANCE (RF & XGB separately)
+# ===================================================================
+fig, ax = plt.subplots(figsize=(10, 6))
+
+# Prepare data
+variables = [VARIABLE_LABELS.get(v, v) for v in a4_importance_df['Variable']]
+rf_scores = a4_importance_df['RF_Importance'].values
+xgb_scores = a4_importance_df['XGB_Importance'].values
+
+# Set up bar positions
+y_pos = np.arange(len(variables))
+bar_height = 0.35
+
+# Create grouped horizontal bars
+bars1 = ax.barh(y_pos - bar_height/2, rf_scores, bar_height, label='Random Forest', color='forestgreen')
+bars2 = ax.barh(y_pos + bar_height/2, xgb_scores, bar_height, label='XGBoost', color='darkorange')
+
+ax.set_yticks(y_pos)
+ax.set_yticklabels(variables)
+ax.set_xlabel('Importance Score', fontsize=16, fontfamily='Arial')
+ax.tick_params(axis='both', labelsize=14)
+ax.invert_yaxis()
+ax.legend(fontsize=12, framealpha=0.9)
+
+plt.tight_layout()
+plt.savefig(output_dir / 'A4_PURITY_Importance.png', dpi=300, bbox_inches='tight')
+plt.close()
+print("✓ Saved: A4_PURITY_Importance.png")
+
+print(f"\n✓ All visualizations saved to: {output_dir.absolute()}")
 
 # ===================================================================
 # FINAL SUMMARY

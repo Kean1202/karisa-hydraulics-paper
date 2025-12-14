@@ -41,7 +41,10 @@ from utils import (
     get_cv_splits,
     aggregate_cross_validate_results,
     get_unique_combinations,
-    print_phase_start
+    print_phase_start,
+    convert_to_percentage,
+    VARIABLE_LABELS,
+    format_axis_for_paper
 )
 
 # Print header for Karisa
@@ -50,14 +53,20 @@ print("Finding the optimal conditions! (For the best engineer ever!)")
 print("=" * 80)
 print_phase_start("PHASE 3: Quality Analysis - Goals B3, B4 & Combined")
 
+# Set up plotting style
+plt.rcParams['font.family'] = 'Arial'
+
 # Load and prepare data
 print("\nLoading and preparing data... (Your brilliance is showing sweetheart!)")
 df_full, df_pass = load_data()
 df_full, df_pass = filter_invalid_values(df_full, df_pass)
 df_full, df_pass = deduplicate_data(df_full, df_pass)
 
+# Convert CONV and PURITY to percentages
+df_pass = convert_to_percentage(df_pass, columns=['CONV', 'PURITY'])
+
 # Use pass_only dataset
-print(f"\nUsing pass_only dataset: {len(df_pass)} samples")
+print(f"\nUsing pass_only dataset: {len(df_pass)} samples (CONV & PURITY in %)")
 
 # Prepare features
 X = df_pass[INDEPENDENT_VARS]

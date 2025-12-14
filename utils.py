@@ -30,7 +30,7 @@ VALID_VALUES = {
 }
 
 
-def load_data(data_path="data/karisa_paper.xlsx"):
+def load_data(data_path="data/AmAc_Tray.xlsx"):
     """
     Load both datasets from Excel file.
 
@@ -440,6 +440,109 @@ def print_phase_complete(phase_name):
     print(f"Completed: {phase_name}")
     print("=" * 80)
     print("You're doing amazing, Karisa!\n")
+
+
+# ===================================================================
+# GRAPH FORMATTING UTILITIES - For Paper Publication
+# ===================================================================
+
+# Variable name mapping for proper axis labels
+VARIABLE_LABELS = {
+    'NHOLES': 'Number of holes',
+    'HDIAM': 'Hole Diameter (m)',
+    'DIAM': 'Diameter (m)',
+    'WEIRHT': 'Weir Height (m)',
+    'TRAYSPC': 'Tray spacing (m)',
+    'DECK': 'Deck Thickness (mm)',
+    'NPASS': 'Number of Passes',
+    'CONV': 'Conversion (%)',
+    'PURITY': 'Purity (%)'
+}
+
+# Color scheme for DESC outcomes
+DESC_COLORS = {
+    'PASS': '#E6B824',    # Yellow
+    'WEEP': '#0E1768',    # Dark Blue
+    'FLOOD': '#E022C1'    # Magenta
+}
+
+def get_variable_label(var_name):
+    """
+    Get proper axis label for a variable name.
+
+    Args:
+        var_name: Variable name (e.g., 'NHOLES', 'CONV')
+
+    Returns:
+        Formatted label string (e.g., 'Number of holes', 'Conversion (%)')
+    """
+    return VARIABLE_LABELS.get(var_name, var_name)
+
+
+def format_axis_for_paper(ax, xlabel=None, ylabel=None,
+                          title=None, colorbar_label=None, cbar=None):
+    """
+    Format axes according to paper requirements:
+    - Font: Arial
+    - Axis labels: 16pt
+    - Axis ticks: 14pt
+    - No titles
+
+    Args:
+        ax: Matplotlib axis object
+        xlabel: X-axis variable name (will be converted to proper label)
+        ylabel: Y-axis variable name (will be converted to proper label)
+        title: Ignored (titles removed for paper)
+        colorbar_label: Label for colorbar if present
+        cbar: Colorbar object
+    """
+    # Set font to Arial
+    import matplotlib.pyplot as plt
+    plt.rcParams['font.family'] = 'Arial'
+
+    # Remove title (for paper)
+    ax.set_title('')
+
+    # Set axis labels with proper formatting
+    if xlabel is not None:
+        label_text = get_variable_label(xlabel) if xlabel in VARIABLE_LABELS else xlabel
+        ax.set_xlabel(label_text, fontsize=16, fontfamily='Arial')
+
+    if ylabel is not None:
+        label_text = get_variable_label(ylabel) if ylabel in VARIABLE_LABELS else ylabel
+        ax.set_ylabel(label_text, fontsize=16, fontfamily='Arial')
+
+    # Set tick label sizes
+    ax.tick_params(axis='both', which='major', labelsize=14)
+
+    # Format tick labels to use Arial
+    for label in ax.get_xticklabels() + ax.get_yticklabels():
+        label.set_fontfamily('Arial')
+
+    # Format colorbar if present
+    if cbar is not None and colorbar_label is not None:
+        cbar.set_label(colorbar_label, fontsize=16, fontfamily='Arial')
+        cbar.ax.tick_params(labelsize=14)
+        for label in cbar.ax.get_yticklabels():
+            label.set_fontfamily('Arial')
+
+
+def convert_to_percentage(df, columns=['CONV', 'PURITY']):
+    """
+    Convert decimal values to percentages (multiply by 100).
+
+    Args:
+        df: DataFrame
+        columns: List of columns to convert (default: ['CONV', 'PURITY'])
+
+    Returns:
+        DataFrame with converted values
+    """
+    df_copy = df.copy()
+    for col in columns:
+        if col in df_copy.columns:
+            df_copy[col] = df_copy[col] * 100
+    return df_copy
 
 
 if __name__ == "__main__":

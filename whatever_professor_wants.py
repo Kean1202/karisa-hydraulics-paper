@@ -36,22 +36,21 @@ import warnings
 warnings.filterwarnings('ignore')
 
 # Import utilities
-from utils import load_data, filter_invalid_values, deduplicate_data
+from utils import (
+    load_data, filter_invalid_values, deduplicate_data,
+    DESC_COLORS, VARIABLE_LABELS, format_axis_for_paper
+)
 
 # Import XGBoost for decision boundaries (Option 3)
 from xgboost import XGBClassifier
 
 # Set up plotting style
 sns.set_style("white")
+plt.rcParams['font.family'] = 'Arial'
 
 # Import magma colormap
 import matplotlib.cm as cm
 magma_cmap = cm.get_cmap('magma')
-DESC_COLORS = {
-    'PASS': magma_cmap(0.2),
-    'WEEP': magma_cmap(0.5),
-    'FLOOD': magma_cmap(0.9)
-}
 
 print("=" * 80)
 print("HYDRAULIC GRADIENT VISUALIZATIONS - 3 APPROACHES")
@@ -60,7 +59,7 @@ print("=" * 80)
 
 # Load and prepare data
 print("\nLoading data...")
-df_full, df_pass = load_data(data_path="data/karisa_paper.xlsx")
+df_full, df_pass = load_data(data_path="data/AmAc_Tray.xlsx")
 df_full, df_pass = filter_invalid_values(df_full, df_pass)
 df_full, df_pass = deduplicate_data(df_full, df_pass)
 
@@ -127,20 +126,15 @@ for idx, (var1, var2) in enumerate(hydraulic_pairs):
         ax.set_xticklabels([f'{int(v)}' if v == int(v) else f'{v:g}' for v in x_vals], rotation=45, ha='right')
         ax.set_yticklabels([f'{int(v)}' if v == int(v) else f'{v:g}' for v in y_vals])
 
-        ax.set_xlabel(var1, fontsize=12, fontweight='bold')
-        ax.set_ylabel(var2, fontsize=12, fontweight='bold')
-        ax.set_title(f'{var1} vs {var2}\nFailure Probability', fontsize=12, fontweight='bold')
-        ax.set_aspect('equal')
-
         # Colorbar
         cbar = plt.colorbar(contourf, ax=ax)
-        cbar.set_label('Failure Rate (%)', fontsize=10)
+
+        # Format for paper
+        format_axis_for_paper(ax, xlabel=var1, ylabel=var2, colorbar_label='Failure Rate (%)', cbar=cbar)
+        ax.set_aspect('equal')
 
 # Clean up temporary column
 df_full.drop('is_failure', axis=1, inplace=True)
-
-fig.suptitle('Option 1: Probability Gradient Background\n(Smooth 0-100% failure risk gradient)',
-             fontsize=16, fontweight='bold')
 plt.tight_layout()
 output_path_1 = output_dir / 'option1_probability_gradient.png'
 plt.savefig(output_path_1, dpi=300, bbox_inches='tight')
@@ -200,13 +194,13 @@ for idx, (var1, var2) in enumerate(hydraulic_pairs):
             x_idx = x_vals.index(row[var1])
             y_idx = y_vals.index(row[var2])
 
-            # Map outcome to magma color
+            # Map outcome to color
             if row['dominant'] == 'PASS':
-                base_color = magma_cmap(0.2)[:3]
+                base_color = tuple(int(DESC_COLORS['PASS'].lstrip('#')[i:i+2], 16)/255 for i in (0, 2, 4))
             elif row['dominant'] == 'WEEP':
-                base_color = magma_cmap(0.5)[:3]
+                base_color = tuple(int(DESC_COLORS['WEEP'].lstrip('#')[i:i+2], 16)/255 for i in (0, 2, 4))
             else:  # FLOOD
-                base_color = magma_cmap(0.9)[:3]
+                base_color = tuple(int(DESC_COLORS['FLOOD'].lstrip('#')[i:i+2], 16)/255 for i in (0, 2, 4))
 
             # Scale by certainty (higher certainty = more vivid)
             certainty = row['certainty']
@@ -238,25 +232,22 @@ for idx, (var1, var2) in enumerate(hydraulic_pairs):
         ax.set_xticklabels([f'{int(v)}' if v == int(v) else f'{v:g}' for v in x_vals], rotation=45, ha='right')
         ax.set_yticklabels([f'{int(v)}' if v == int(v) else f'{v:g}' for v in y_vals])
 
-        ax.set_xlabel(var1, fontsize=12, fontweight='bold')
-        ax.set_ylabel(var2, fontsize=12, fontweight='bold')
-        ax.set_title(f'{var1} vs {var2}\nDominant Outcome + Certainty', fontsize=12, fontweight='bold')
+        # Format for paper
+        format_axis_for_paper(ax, xlabel=var1, ylabel=var2)
         ax.set_xlim(extent[0], extent[1])
         ax.set_ylim(extent[2], extent[3])
 
 # Add custom legend
 from matplotlib.patches import Patch
 legend_elements = [
-    Patch(facecolor=magma_cmap(0.2), label='PASS (dominant)'),
-    Patch(facecolor=magma_cmap(0.5), label='WEEP (dominant)'),
-    Patch(facecolor=magma_cmap(0.9), label='FLOOD (dominant)'),
+    Patch(facecolor=DESC_COLORS['PASS'], label='PASS (dominant)'),
+    Patch(facecolor=DESC_COLORS['WEEP'], label='WEEP (dominant)'),
+    Patch(facecolor=DESC_COLORS['FLOOD'], label='FLOOD (dominant)'),
     Patch(facecolor=[0.7, 0.7, 0.7], label='Low certainty (faded)')
 ]
 fig.legend(handles=legend_elements, loc='upper right', fontsize=11, framealpha=0.9)
 
-fig.suptitle('Option 2: Three-Class Probability Heatmap\n(Dominant outcome with certainty intensity)',
-             fontsize=16, fontweight='bold')
-plt.tight_layout(rect=[0, 0, 1, 0.96])
+plt.tight_layout()
 output_path_2 = output_dir / 'option2_certainty_heatmap.png'
 plt.savefig(output_path_2, dpi=300, bbox_inches='tight')
 print(f"✓ Saved: {output_path_2}")
@@ -350,18 +341,13 @@ for idx, (var1, var2) in enumerate(hydraulic_pairs):
         ax.set_xticklabels([f'{int(v)}' if v == int(v) else f'{v:g}' for v in x_vals], rotation=45, ha='right')
         ax.set_yticklabels([f'{int(v)}' if v == int(v) else f'{v:g}' for v in y_vals])
 
-        ax.set_xlabel(var1, fontsize=12, fontweight='bold')
-        ax.set_ylabel(var2, fontsize=12, fontweight='bold')
-        ax.set_title(f'{var1} vs {var2}\nGradient + Data + Boundaries', fontsize=12, fontweight='bold')
-        ax.set_aspect('equal')
-        ax.legend(loc='best', fontsize=9, framealpha=0.8)
-
         # Colorbar for gradient
         cbar = plt.colorbar(contourf, ax=ax, alpha=0.6)
-        cbar.set_label('Failure Rate (%)', fontsize=10)
 
-fig.suptitle('Option 3: Hybrid Gradient Visualization\n(Gradient background + Scatter points + Decision boundaries)',
-             fontsize=16, fontweight='bold')
+        # Format for paper
+        format_axis_for_paper(ax, xlabel=var1, ylabel=var2, colorbar_label='Failure Rate (%)', cbar=cbar)
+        ax.set_aspect('equal')
+        ax.legend(loc='best', fontsize=9, framealpha=0.8)
 plt.tight_layout()
 output_path_3 = output_dir / 'option3_hybrid.png'
 plt.savefig(output_path_3, dpi=300, bbox_inches='tight')
