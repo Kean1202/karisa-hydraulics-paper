@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Main pipeline (WITHOUT HPA feature).
+Main pipeline (WITH HPA).
 
 Run:
-    python main.py
+    python main_no_hpa.py
 """
 
 import os
@@ -20,6 +20,7 @@ STEPS = [
     ("Interaction Diagrams", "interaction_diagrams.py"),
     ("Discrete Contour Maps", "discrete_contour_map.py"),
     ("MeAc Full Scatter Graph", "Fullgraph_MeAc.py"),
+    ("HPA Sweet-Spot Visualization", "hpa_sweet_spot.py"),
 ]
 
 
@@ -49,11 +50,11 @@ def main():
         sys.exit(1)
 
     env = dict(os.environ)
-    env["KARISA_USE_HPA"] = "0"
+    env["KARISA_USE_HPA"] = "1"
     env["PYTHONIOENCODING"] = "utf-8"
 
     print("=" * 80)
-    print("  KARISA PROJECT - FULL ANALYSIS PIPELINE (WITHOUT HPA)")
+    print("  KARISA PROJECT - FULL ANALYSIS PIPELINE (WITH HPA)")
     print(f"  Dataset: {DATASET_PATH.relative_to(ROOT)}")
     print("=" * 80)
 

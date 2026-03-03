@@ -13,6 +13,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from datetime import datetime
 
+plt.rcParams['font.family'] = 'Arial'
+
 def clear_screen():
     """Clear the console (sort of)"""
     print("\n" * 50)
@@ -217,7 +219,7 @@ def main():
     # Save the chart
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f'for_karisa_with_love_{timestamp}.png'
-    plt.savefig(filename, dpi=300, bbox_inches='tight', facecolor='white')
+    plt.savefig(filename, dpi=1000, bbox_inches='tight', facecolor='white')
 
     print(f"\n✓ Chart saved: {filename}")
     print("\nDisplaying visualization...")

@@ -40,6 +40,7 @@ from utils import (
     deduplicate_data,
     create_binary_targets,
     INDEPENDENT_VARS,
+    USE_HPA,
     get_cv_splits,
     normalize_importance_to_ranks,
     print_phase_start,
@@ -52,6 +53,7 @@ from utils import (
 print("=" * 80)
 print("BEST MODELS ANALYSIS - Random Forest & XGBoost Only")
 print("Using only the champions, just like Karisa!")
+print(f"Feature mode: {'with HPA' if USE_HPA else 'without HPA'}")
 print("=" * 80)
 print_phase_start("Re-analyzing with Best Models: RF & XGB")
 
@@ -410,7 +412,8 @@ print("\n" + "=" * 80)
 print("Saving results to Excel...")
 print("=" * 80)
 
-output_excel = "results/Best_Models_Analysis_Results.xlsx"
+output_suffix = "" if USE_HPA else "_NO_HPA"
+output_excel = f"results/Best_Models_Analysis_Results{output_suffix}.xlsx"
 
 # Create model comparison dataframes
 a1_comparison_df = pd.DataFrame([{'Model': k, **v} for k, v in a1_results.items()])
@@ -443,7 +446,7 @@ print("=" * 80)
 
 # Create output directory
 from pathlib import Path
-output_dir = Path("results/best_model")
+output_dir = Path("results/best_model" if USE_HPA else "results/best_model_no_hpa")
 output_dir.mkdir(parents=True, exist_ok=True)
 
 # ===================================================================
@@ -476,7 +479,7 @@ ax.invert_yaxis()
 ax.legend(fontsize=12, framealpha=0.9)
 
 plt.tight_layout()
-plt.savefig(output_dir / 'A1_WEEP_Importance.png', dpi=300, bbox_inches='tight')
+plt.savefig(output_dir / 'A1_WEEP_Importance.png', dpi=1000, bbox_inches='tight')
 plt.close()
 print("✓ Saved: A1_WEEP_Importance.png")
 
@@ -507,7 +510,7 @@ ax.invert_yaxis()
 ax.legend(fontsize=12, framealpha=0.9)
 
 plt.tight_layout()
-plt.savefig(output_dir / 'A2_FLOOD_Importance.png', dpi=300, bbox_inches='tight')
+plt.savefig(output_dir / 'A2_FLOOD_Importance.png', dpi=1000, bbox_inches='tight')
 plt.close()
 print("✓ Saved: A2_FLOOD_Importance.png")
 
@@ -538,7 +541,7 @@ ax.invert_yaxis()
 ax.legend(fontsize=12, framealpha=0.9)
 
 plt.tight_layout()
-plt.savefig(output_dir / 'A3_CONV_Importance.png', dpi=300, bbox_inches='tight')
+plt.savefig(output_dir / 'A3_CONV_Importance.png', dpi=1000, bbox_inches='tight')
 plt.close()
 print("✓ Saved: A3_CONV_Importance.png")
 
@@ -569,7 +572,7 @@ ax.invert_yaxis()
 ax.legend(fontsize=12, framealpha=0.9)
 
 plt.tight_layout()
-plt.savefig(output_dir / 'A4_PURITY_Importance.png', dpi=300, bbox_inches='tight')
+plt.savefig(output_dir / 'A4_PURITY_Importance.png', dpi=1000, bbox_inches='tight')
 plt.close()
 print("✓ Saved: A4_PURITY_Importance.png")
 

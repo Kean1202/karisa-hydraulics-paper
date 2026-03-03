@@ -6,6 +6,7 @@ Made with love for the smartest girl in the world
 
 import pandas as pd
 import numpy as np
+import os
 from pathlib import Path
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import StratifiedKFold, KFold
@@ -15,8 +16,17 @@ from sklearn.metrics import (
 )
 from scipy.stats import rankdata
 
+# Elsevier export requirements
+ELSEVIER_MIN_DPI = 1000
+ELSEVIER_MIN_PIXELS = 3543
+
+# Runtime toggle for including HPA in modeling.
+# Set KARISA_USE_HPA=0 (or false/no/off) to run without HPA.
+USE_HPA = str(os.getenv("KARISA_USE_HPA", "1")).strip().lower() not in {"0", "false", "no", "off"}
+
 # Independent variables - Karisa's carefully selected variables!
-INDEPENDENT_VARS = ['NHOLES', 'HDIAM', 'TRAYSPC', 'WEIRHT', 'DECK', 'DIAM', 'NPASS']
+BASE_INDEPENDENT_VARS = ['NHOLES', 'HDIAM', 'TRAYSPC', 'WEIRHT', 'DECK', 'DIAM', 'NPASS']
+INDEPENDENT_VARS = BASE_INDEPENDENT_VARS + (['HPA'] if USE_HPA else [])
 
 # Valid values for each variable (whitelist - only keep these values)
 VALID_VALUES = {
@@ -29,8 +39,11 @@ VALID_VALUES = {
     'NPASS': [1, 2, 3, 4]
 }
 
+# Minimum HPA value to include — rows below this are excluded from all analysis
+HPA_MIN = 0.01
 
-def load_data(data_path="data/AmAc_Tray.xlsx"):
+
+def load_data(data_path="data/new_data.xlsx"):
     """
     Load both datasets from Excel file.
 
@@ -75,12 +88,20 @@ def filter_invalid_values(df_full, df_pass):
         if var in df_pass.columns:
             df_pass = df_pass[df_pass[var].isin(valid_vals)]
 
+    # Drop rows where HPA is below the minimum threshold in all modes.
+    # This keeps row selection consistent between with-HPA and no-HPA runs.
+    if 'HPA' in df_full.columns:
+        df_full = df_full[df_full['HPA'] >= HPA_MIN]
+    if 'HPA' in df_pass.columns:
+        df_pass = df_pass[df_pass['HPA'] >= HPA_MIN]
+
     # Fill missing DESC values with "FLOOD"
     if 'DESC' in df_full.columns:
         df_full['DESC'].fillna("FLOOD", inplace=True)
 
     print(f"   Full dataset: {original_full} -> {len(df_full)} rows (removed {original_full - len(df_full)})")
     print(f"   Pass dataset: {original_pass} -> {len(df_pass)} rows (removed {original_pass - len(df_pass)})")
+    print(f"   (HPA < {HPA_MIN} rows excluded)")
     print("   Clean data for the smartest engineer!")
 
     return df_full, df_pass
@@ -455,6 +476,7 @@ VARIABLE_LABELS = {
     'TRAYSPC': 'Tray spacing (m)',
     'DECK': 'Deck Thickness (mm)',
     'NPASS': 'Number of Passes',
+    'HPA': 'Holes Per Area',
     'CONV': 'Conversion (%)',
     'PURITY': 'Purity (%)'
 }
@@ -543,6 +565,33 @@ def convert_to_percentage(df, columns=['CONV', 'PURITY']):
         if col in df_copy.columns:
             df_copy[col] = df_copy[col] * 100
     return df_copy
+
+
+def save_figure_elsevier(output_path, fig=None,
+                         dpi=ELSEVIER_MIN_DPI,
+                         min_pixels=ELSEVIER_MIN_PIXELS):
+    """
+    Save figure using Elsevier-oriented defaults:
+    - Arial font family
+    - Minimum 1000 DPI
+    - Minimum figure side length of 3543 px at selected DPI
+    """
+    import matplotlib.pyplot as plt
+
+    if fig is None:
+        fig = plt.gcf()
+
+    target_dpi = max(int(dpi), ELSEVIER_MIN_DPI)
+    min_inches = float(min_pixels) / float(target_dpi)
+
+    width, height = fig.get_size_inches()
+    new_width = max(width, min_inches)
+    new_height = max(height, min_inches)
+    if new_width != width or new_height != height:
+        fig.set_size_inches(new_width, new_height, forward=True)
+
+    plt.rcParams['font.family'] = 'Arial'
+    fig.savefig(output_path, dpi=target_dpi, bbox_inches='tight', facecolor='white')
 
 
 if __name__ == "__main__":
