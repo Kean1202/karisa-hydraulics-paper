@@ -3,7 +3,7 @@
 Main pipeline (WITH HPA).
 
 Run:
-    python main_no_hpa.py
+    python main_with_hpa.py
 """
 
 import os
