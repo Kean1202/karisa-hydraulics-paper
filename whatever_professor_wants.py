@@ -61,7 +61,7 @@ print("=" * 80)
 print("\nLoading data...")
 df_full, df_pass = load_data(data_path="data/AmAc_Tray.xlsx")
 df_full, df_pass = filter_invalid_values(df_full, df_pass)
-df_full, df_pass = deduplicate_data(df_full, df_pass)
+# df_full, df_pass = deduplicate_data(df_full, df_pass)  # REMOVED - no duplicates in data
 
 print(f"Full dataset: {len(df_full)} samples (after deduplication)")
 

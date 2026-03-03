@@ -37,9 +37,9 @@ print("=" * 80)
 
 # Load and prepare data
 print("\nLoading data...")
-df_full, df_pass = load_data(data_path="data/karisa_paper.xlsx")
+df_full, df_pass = load_data(data_path="data/AmAc_Tray.xlsx")
 df_full, df_pass = filter_invalid_values(df_full, df_pass)
-df_full, df_pass = deduplicate_data(df_full, df_pass)
+# df_full, df_pass = deduplicate_data(df_full, df_pass)  # REMOVED - no duplicates in data
 df_full = create_binary_targets(df_full)
 
 print(f"Full dataset: {len(df_full)} samples")

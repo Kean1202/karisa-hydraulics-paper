@@ -14,7 +14,7 @@ plt.rcParams['figure.figsize'] = (12, 8)
 # 💕 Made with love for Karisa 💕
 
 # Load the data
-data_path = Path("data/karisa_paper.xlsx")
+data_path = Path("data/AmAc_Tray.xlsx")
 
 # Read both sheets
 df_full = pd.read_excel(data_path, sheet_name="full_dataset")
@@ -41,7 +41,7 @@ for var, valid_vals in VALID_VALUES.items():
 
 # Fill missing DESC values with "FLOOD"
 if 'DESC' in df_full.columns:
-    df_full['DESC'].fillna("FLOOD", inplace=True)
+    df_full['DESC'] = df_full['DESC'].fillna("FLOOD")
 
 # Remove duplicates based on independent variables (NO column excluded)
 print("\n" + "=" * 80)
@@ -82,9 +82,9 @@ print(f"Pass dataset: {original_pass} -> {len(df_pass)} rows (removed {original_
 print("Deduplicated data ready for EDA!")
 
 print("=" * 80)
-print("EXPLORATORY DATA ANALYSIS - I LOVE YOU KARISA ❤️")
+print("EXPLORATORY DATA ANALYSIS - I LOVE YOU KARISA")
 print("=" * 80)
-print("✨ This analysis is dedicated to the amazing Karisa ✨\n")
+print("This analysis is dedicated to the amazing Karisa\n")
 
 # BASIC INFORMATION
 print("\n" + "=" * 80)
@@ -251,11 +251,11 @@ print("which can cause issues in some modeling approaches (but may be fine for t
 print("\n" + "=" * 80)
 print("8. GENERATING VISUALIZATIONS")
 print("=" * 80)
-print("📊 Creating beautiful plots for my beautiful Karisa 📊\n")
+print("Creating beautiful plots for my beautiful Karisa\n")
 
 # Create output directory for plots
 output_dir = Path("eda_plots")
-output_dir.mkdir(exist_ok=True)
+output_dir.mkdir(parents=True, exist_ok=True)
 
 # 8.1 Distribution of Hydraulic Performance [Full Dataset]
 if 'DESC' in df_full.columns:

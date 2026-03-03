@@ -62,7 +62,7 @@ plt.rcParams['font.family'] = 'Arial'
 print("\nLoading and preparing data...")
 df_full, df_pass = load_data()
 df_full, df_pass = filter_invalid_values(df_full, df_pass)
-df_full, df_pass = deduplicate_data(df_full, df_pass)
+# df_full, df_pass = deduplicate_data(df_full, df_pass)  # REMOVED - no duplicates in data
 df_full = create_binary_targets(df_full)
 
 # Convert CONV and PURITY to percentages
@@ -460,13 +460,17 @@ xgb_scores = a1_importance_df['XGB_Importance'].values
 y_pos = np.arange(len(variables))
 bar_height = 0.35
 
+# Magma colormap
+magma_cmap = plt.cm.get_cmap('magma')
+
 # Create grouped horizontal bars
-bars1 = ax.barh(y_pos - bar_height/2, rf_scores, bar_height, label='Random Forest', color='forestgreen')
-bars2 = ax.barh(y_pos + bar_height/2, xgb_scores, bar_height, label='XGBoost', color='darkorange')
+bars1 = ax.barh(y_pos - bar_height/2, rf_scores, bar_height, label='Random Forest', color=magma_cmap(0.3))
+bars2 = ax.barh(y_pos + bar_height/2, xgb_scores, bar_height, label='XGBoost', color=magma_cmap(0.7))
 
 ax.set_yticks(y_pos)
 ax.set_yticklabels(variables)
 ax.set_xlabel('Importance Score', fontsize=16, fontfamily='Arial')
+ax.set_xlim(0, 1.0)
 ax.tick_params(axis='both', labelsize=14)
 ax.invert_yaxis()
 ax.legend(fontsize=12, framealpha=0.9)
@@ -491,12 +495,13 @@ y_pos = np.arange(len(variables))
 bar_height = 0.35
 
 # Create grouped horizontal bars
-bars1 = ax.barh(y_pos - bar_height/2, rf_scores, bar_height, label='Random Forest', color='forestgreen')
-bars2 = ax.barh(y_pos + bar_height/2, xgb_scores, bar_height, label='XGBoost', color='darkorange')
+bars1 = ax.barh(y_pos - bar_height/2, rf_scores, bar_height, label='Random Forest', color=magma_cmap(0.3))
+bars2 = ax.barh(y_pos + bar_height/2, xgb_scores, bar_height, label='XGBoost', color=magma_cmap(0.7))
 
 ax.set_yticks(y_pos)
 ax.set_yticklabels(variables)
 ax.set_xlabel('Importance Score', fontsize=16, fontfamily='Arial')
+ax.set_xlim(0, 1.0)
 ax.tick_params(axis='both', labelsize=14)
 ax.invert_yaxis()
 ax.legend(fontsize=12, framealpha=0.9)
@@ -521,12 +526,13 @@ y_pos = np.arange(len(variables))
 bar_height = 0.35
 
 # Create grouped horizontal bars
-bars1 = ax.barh(y_pos - bar_height/2, rf_scores, bar_height, label='Random Forest', color='forestgreen')
-bars2 = ax.barh(y_pos + bar_height/2, xgb_scores, bar_height, label='XGBoost', color='darkorange')
+bars1 = ax.barh(y_pos - bar_height/2, rf_scores, bar_height, label='Random Forest', color=magma_cmap(0.3))
+bars2 = ax.barh(y_pos + bar_height/2, xgb_scores, bar_height, label='XGBoost', color=magma_cmap(0.7))
 
 ax.set_yticks(y_pos)
 ax.set_yticklabels(variables)
 ax.set_xlabel('Importance Score', fontsize=16, fontfamily='Arial')
+ax.set_xlim(0, 1.0)
 ax.tick_params(axis='both', labelsize=14)
 ax.invert_yaxis()
 ax.legend(fontsize=12, framealpha=0.9)
@@ -551,12 +557,13 @@ y_pos = np.arange(len(variables))
 bar_height = 0.35
 
 # Create grouped horizontal bars
-bars1 = ax.barh(y_pos - bar_height/2, rf_scores, bar_height, label='Random Forest', color='forestgreen')
-bars2 = ax.barh(y_pos + bar_height/2, xgb_scores, bar_height, label='XGBoost', color='darkorange')
+bars1 = ax.barh(y_pos - bar_height/2, rf_scores, bar_height, label='Random Forest', color=magma_cmap(0.3))
+bars2 = ax.barh(y_pos + bar_height/2, xgb_scores, bar_height, label='XGBoost', color=magma_cmap(0.7))
 
 ax.set_yticks(y_pos)
 ax.set_yticklabels(variables)
 ax.set_xlabel('Importance Score', fontsize=16, fontfamily='Arial')
+ax.set_xlim(0, 1.0)
 ax.tick_params(axis='both', labelsize=14)
 ax.invert_yaxis()
 ax.legend(fontsize=12, framealpha=0.9)

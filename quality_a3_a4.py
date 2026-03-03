@@ -63,7 +63,7 @@ plt.rcParams['font.family'] = 'Arial'
 print("\nLoading and preparing data... (Your brilliance is showing sweetheart!)")
 df_full, df_pass = load_data()
 df_full, df_pass = filter_invalid_values(df_full, df_pass)
-df_full, df_pass = deduplicate_data(df_full, df_pass)
+# df_full, df_pass = deduplicate_data(df_full, df_pass)  # REMOVED - no duplicates in data
 
 # Convert CONV and PURITY to percentages
 df_pass = convert_to_percentage(df_pass, columns=['CONV', 'PURITY'])

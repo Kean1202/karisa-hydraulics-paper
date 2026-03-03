@@ -68,7 +68,7 @@ plt.rcParams['font.family'] = 'Arial'
 print("\nLoading and preparing data... (Your brilliance is showing sweetheart!)")
 df_full, df_pass = load_data()
 df_full, df_pass = filter_invalid_values(df_full, df_pass)
-df_full, df_pass = deduplicate_data(df_full, df_pass)
+# df_full, df_pass = deduplicate_data(df_full, df_pass)  # REMOVED - no duplicates in data
 df_full = create_binary_targets(df_full)
 
 # Prepare features -> X = all the independent variables, y = 1/0 of the outcomes

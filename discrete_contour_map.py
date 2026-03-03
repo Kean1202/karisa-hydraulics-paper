@@ -25,10 +25,14 @@ import warnings
 warnings.filterwarnings('ignore')
 
 # Import utilities
-from utils import load_data, filter_invalid_values, deduplicate_data, create_binary_targets
+from utils import (
+    load_data, filter_invalid_values, deduplicate_data, create_binary_targets,
+    VARIABLE_LABELS, format_axis_for_paper, convert_to_percentage
+)
 
 # Set up plotting style
 sns.set_style("white")
+plt.rcParams['font.family'] = 'Arial'
 
 print("=" * 80)
 print("DISCRETE CONTOUR MAP VISUALIZATIONS")
@@ -37,13 +41,16 @@ print("=" * 80)
 
 # Load and prepare data
 print("\nLoading data...")
-df_full, df_pass = load_data(data_path="data/karisa_paper.xlsx")
+df_full, df_pass = load_data(data_path="data/AmAc_Tray.xlsx")
 df_full, df_pass = filter_invalid_values(df_full, df_pass)
-df_full, df_pass = deduplicate_data(df_full, df_pass)
+# df_full, df_pass = deduplicate_data(df_full, df_pass)  # REMOVED - no duplicates in data
 df_full = create_binary_targets(df_full)
 
+# Convert CONV and PURITY to percentages
+df_pass = convert_to_percentage(df_pass, columns=['CONV', 'PURITY'])
+
 print(f"Full dataset: {len(df_full)} samples")
-print(f"Pass dataset: {len(df_pass)} samples")
+print(f"Pass dataset: {len(df_pass)} samples (CONV & PURITY in %)")
 
 # Create output directory
 output_dir = Path("results/discrete_contour_maps")
@@ -139,17 +146,12 @@ for idx, (var1, var2) in enumerate(hydraulic_pairs):
         ax.set_xticklabels([f'{int(v)}' if v == int(v) else f'{v:g}' for v in x_vals], rotation=45, ha='right')
         ax.set_yticklabels([f'{int(v)}' if v == int(v) else f'{v:g}' for v in y_vals])
 
-        ax.set_xlabel(var1, fontsize=12, fontweight='bold')
-        ax.set_ylabel(var2, fontsize=12, fontweight='bold')
-        ax.set_title(f'{var1} vs {var2}\nFailure Rate (%)', fontsize=12, fontweight='bold')
-        ax.set_aspect('equal')
-
         # Colorbar
         cbar = plt.colorbar(contourf, ax=ax)
-        cbar.set_label('Failure %', fontsize=10)
 
-fig.suptitle('Hydraulic Failures: Discrete Contour Map\n(% WEEP + FLOOD per combination)',
-             fontsize=16, fontweight='bold')
+        # Format for paper
+        format_axis_for_paper(ax, xlabel=var1, ylabel=var2, colorbar_label='Failure Rate (%)', cbar=cbar)
+        ax.set_aspect('equal')
 plt.tight_layout()
 plt.savefig(output_dir / 'hydraulic_failures_contour_maps.png', dpi=300, bbox_inches='tight')
 print("✓ Saved: hydraulic_failures_contour_maps.png")
@@ -213,17 +215,12 @@ for idx, (var1, var2) in enumerate(conversion_pairs):
         ax.set_xticklabels([f'{int(v)}' if v == int(v) else f'{v:g}' for v in x_vals], rotation=45, ha='right')
         ax.set_yticklabels([f'{int(v)}' if v == int(v) else f'{v:g}' for v in y_vals])
 
-        ax.set_xlabel(var1, fontsize=12, fontweight='bold')
-        ax.set_ylabel(var2, fontsize=12, fontweight='bold')
-        ax.set_title(f'{var1} vs {var2}\nMean CONVERSION', fontsize=12, fontweight='bold')
-        ax.set_aspect('equal')
-
         # Colorbar
         cbar = plt.colorbar(contourf, ax=ax)
-        cbar.set_label('CONVERSION', fontsize=10)
 
-fig.suptitle('CONVERSION: Discrete Contour Map\n(Mean CONVERSION per combination)',
-             fontsize=16, fontweight='bold')
+        # Format for paper
+        format_axis_for_paper(ax, xlabel=var1, ylabel=var2, colorbar_label='Conversion (%)', cbar=cbar)
+        ax.set_aspect('equal')
 plt.tight_layout()
 plt.savefig(output_dir / 'conversion_contour_maps.png', dpi=300, bbox_inches='tight')
 print("✓ Saved: conversion_contour_maps.png")
@@ -284,17 +281,12 @@ for idx, (var1, var2) in enumerate(purity_pairs):
         ax.set_xticklabels([f'{int(v)}' if v == int(v) else f'{v:g}' for v in x_vals], rotation=45, ha='right')
         ax.set_yticklabels([f'{int(v)}' if v == int(v) else f'{v:g}' for v in y_vals])
 
-        ax.set_xlabel(var1, fontsize=12, fontweight='bold')
-        ax.set_ylabel(var2, fontsize=12, fontweight='bold')
-        ax.set_title(f'{var1} vs {var2}\nMean PURITY', fontsize=12, fontweight='bold')
-        ax.set_aspect('equal')
-
         # Colorbar
         cbar = plt.colorbar(contourf, ax=ax)
-        cbar.set_label('PURITY', fontsize=10)
 
-fig.suptitle('PURITY: Discrete Contour Map\n(Mean PURITY per combination)',
-             fontsize=16, fontweight='bold')
+        # Format for paper
+        format_axis_for_paper(ax, xlabel=var1, ylabel=var2, colorbar_label='Purity (%)', cbar=cbar)
+        ax.set_aspect('equal')
 plt.tight_layout()
 plt.savefig(output_dir / 'purity_contour_maps.png', dpi=300, bbox_inches='tight')
 print("✓ Saved: purity_contour_maps.png")

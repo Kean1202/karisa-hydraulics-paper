@@ -45,7 +45,7 @@ print("=" * 80)
 print("\nLoading data...")
 df_full, df_pass = load_data(data_path="data/AmAc_Tray.xlsx")
 df_full, df_pass = filter_invalid_values(df_full, df_pass)
-df_full, df_pass = deduplicate_data(df_full, df_pass)
+# df_full, df_pass = deduplicate_data(df_full, df_pass)  # TEMPORARILY DISABLED
 df_full = create_binary_targets(df_full)
 
 # Convert CONV and PURITY to percentages
