@@ -24,8 +24,15 @@ ELSEVIER_MIN_PIXELS = 3543
 # Set KARISA_USE_HPA=0 (or false/no/off) to run without HPA.
 USE_HPA = str(os.getenv("KARISA_USE_HPA", "1")).strip().lower() not in {"0", "false", "no", "off"}
 
+# DIAM-separated mode: filter dataset to a single DIAM value and drop DIAM from features.
+# Set KARISA_DIAM_FILTER=1.5 (any valid DIAM value) to activate.
+DIAM_FILTER_STR = os.getenv("KARISA_DIAM_FILTER", "").strip()
+USE_DIAM_FILTER = bool(DIAM_FILTER_STR)
+
 # Independent variables - Karisa's carefully selected variables!
 BASE_INDEPENDENT_VARS = ['NHOLES', 'HDIAM', 'TRAYSPC', 'WEIRHT', 'DECK', 'DIAM', 'NPASS']
+if USE_DIAM_FILTER:
+    BASE_INDEPENDENT_VARS = [v for v in BASE_INDEPENDENT_VARS if v != 'DIAM']
 INDEPENDENT_VARS = BASE_INDEPENDENT_VARS + (['HPA'] if USE_HPA else [])
 
 # Valid values for each variable (whitelist - only keep these values)
@@ -103,6 +110,33 @@ def filter_invalid_values(df_full, df_pass):
     print(f"   Pass dataset: {original_pass} -> {len(df_pass)} rows (removed {original_pass - len(df_pass)})")
     print(f"   (HPA < {HPA_MIN} rows excluded)")
     print("   Clean data for the smartest engineer!")
+
+    return df_full, df_pass
+
+
+def filter_by_diam(df_full, df_pass):
+    """
+    Filter datasets to a single DIAM value (used in DIAM-separated mode).
+    Only active when KARISA_DIAM_FILTER env var is set.
+
+    Args:
+        df_full: Full dataset
+        df_pass: Pass only dataset
+
+    Returns:
+        Filtered copies of both datasets
+    """
+    if not USE_DIAM_FILTER:
+        return df_full, df_pass
+
+    diam_val = float(DIAM_FILTER_STR)
+    print(f"\nFiltering to DIAM = {diam_val:g}... (Karisa's focused analysis!)")
+
+    df_full = df_full[df_full['DIAM'] == diam_val].copy()
+    df_pass = df_pass[df_pass['DIAM'] == diam_val].copy()
+
+    print(f"   Full dataset after DIAM filter: {len(df_full)} rows")
+    print(f"   Pass dataset after DIAM filter: {len(df_pass)} rows")
 
     return df_full, df_pass
 
