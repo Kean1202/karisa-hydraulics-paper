@@ -128,7 +128,7 @@ def plot_density_scatter(df, title, output_stem, axis_limits, output_dir):
         edgecolors="none",
     )
 
-    # Equilibrium point (not included in legend by request)
+    # Equilibrium point
     ax.scatter(
         [EQ_X],
         [EQ_Y],
@@ -139,19 +139,29 @@ def plot_density_scatter(df, title, output_stem, axis_limits, output_dir):
         zorder=5,
     )
 
-    ax.set_title(title)
     ax.set_xlabel("Conversion (%)")
     ax.set_ylabel("Purity (%)")
     ax.xaxis.set_major_formatter(PercentFormatter())
     ax.yaxis.set_major_formatter(PercentFormatter())
     ax.set_xlim(axis_limits[0], 100)
     ax.set_ylim(axis_limits[2], 100)
+    ax.set_aspect('equal')
+    ax.grid(True, alpha=0.3)
     apply_font(ax)
 
-    # Legend only for density levels 0.1..0.5
+    # Legend: density levels + equilibrium point
     density_handles = make_density_legend_handles()
+    eq_handle = Line2D(
+        [0], [0],
+        marker="*",
+        linestyle="",
+        markerfacecolor="#F81F8B",
+        markeredgecolor="none",
+        markersize=12,
+        label="Equilibrium",
+    )
     ax.legend(
-        handles=density_handles,
+        handles=density_handles + [eq_handle],
         title="Density",
         loc="best",
         frameon=True,

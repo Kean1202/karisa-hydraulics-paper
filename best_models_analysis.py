@@ -434,7 +434,7 @@ with pd.ExcelWriter(output_excel, engine='openpyxl') as writer:
     a4_importance_df.to_excel(writer, sheet_name='A4_PURITY_Importance', index=False)
     a4_comparison_df.to_excel(writer, sheet_name='A4_PURITY_Models', index=False)
 
-print(f"\n✓ Results saved to: {output_excel}")
+print(f"\nResults saved to: {output_excel}")
 print("  - 8 sheets total (importance + models for each goal)")
 
 # ===================================================================
@@ -481,7 +481,24 @@ ax.legend(fontsize=12, framealpha=0.9)
 plt.tight_layout()
 plt.savefig(output_dir / 'A1_WEEP_Importance.png', dpi=1000, bbox_inches='tight')
 plt.close()
-print("✓ Saved: A1_WEEP_Importance.png")
+print("Saved: A1_WEEP_Importance.png")
+
+# A1 RF-only
+fig, ax = plt.subplots(figsize=(10, 6))
+rf_only_df = a1_importance_df.sort_values('RF_Importance', ascending=False)
+variables_rf = [VARIABLE_LABELS.get(v, v) for v in rf_only_df['Variable']]
+y_pos_rf = np.arange(len(variables_rf))
+ax.barh(y_pos_rf, rf_only_df['RF_Importance'].values, color=magma_cmap(0.3))
+ax.set_yticks(y_pos_rf)
+ax.set_yticklabels(variables_rf)
+ax.set_xlabel('Importance Score', fontsize=16, fontfamily='Arial')
+ax.set_xlim(0, 1.0)
+ax.tick_params(axis='both', labelsize=14)
+ax.invert_yaxis()
+plt.tight_layout()
+plt.savefig(output_dir / 'A1_WEEP_Importance_RF_only.png', dpi=1000, bbox_inches='tight')
+plt.close()
+print("Saved: A1_WEEP_Importance_RF_only.png")
 
 # ===================================================================
 # A2: FLOOD IMPORTANCE (RF & XGB separately)
@@ -512,7 +529,24 @@ ax.legend(fontsize=12, framealpha=0.9)
 plt.tight_layout()
 plt.savefig(output_dir / 'A2_FLOOD_Importance.png', dpi=1000, bbox_inches='tight')
 plt.close()
-print("✓ Saved: A2_FLOOD_Importance.png")
+print("Saved: A2_FLOOD_Importance.png")
+
+# A2 RF-only
+fig, ax = plt.subplots(figsize=(10, 6))
+rf_only_df = a2_importance_df.sort_values('RF_Importance', ascending=False)
+variables_rf = [VARIABLE_LABELS.get(v, v) for v in rf_only_df['Variable']]
+y_pos_rf = np.arange(len(variables_rf))
+ax.barh(y_pos_rf, rf_only_df['RF_Importance'].values, color=magma_cmap(0.3))
+ax.set_yticks(y_pos_rf)
+ax.set_yticklabels(variables_rf)
+ax.set_xlabel('Importance Score', fontsize=16, fontfamily='Arial')
+ax.set_xlim(0, 1.0)
+ax.tick_params(axis='both', labelsize=14)
+ax.invert_yaxis()
+plt.tight_layout()
+plt.savefig(output_dir / 'A2_FLOOD_Importance_RF_only.png', dpi=1000, bbox_inches='tight')
+plt.close()
+print("Saved: A2_FLOOD_Importance_RF_only.png")
 
 # ===================================================================
 # A3: CONVERSION IMPORTANCE (RF & XGB separately)
@@ -543,7 +577,24 @@ ax.legend(fontsize=12, framealpha=0.9)
 plt.tight_layout()
 plt.savefig(output_dir / 'A3_CONV_Importance.png', dpi=1000, bbox_inches='tight')
 plt.close()
-print("✓ Saved: A3_CONV_Importance.png")
+print("Saved: A3_CONV_Importance.png")
+
+# A3 RF-only
+fig, ax = plt.subplots(figsize=(10, 6))
+rf_only_df = a3_importance_df.sort_values('RF_Importance', ascending=False)
+variables_rf = [VARIABLE_LABELS.get(v, v) for v in rf_only_df['Variable']]
+y_pos_rf = np.arange(len(variables_rf))
+ax.barh(y_pos_rf, rf_only_df['RF_Importance'].values, color=magma_cmap(0.3))
+ax.set_yticks(y_pos_rf)
+ax.set_yticklabels(variables_rf)
+ax.set_xlabel('Importance Score', fontsize=16, fontfamily='Arial')
+ax.set_xlim(0, 1.0)
+ax.tick_params(axis='both', labelsize=14)
+ax.invert_yaxis()
+plt.tight_layout()
+plt.savefig(output_dir / 'A3_CONV_Importance_RF_only.png', dpi=1000, bbox_inches='tight')
+plt.close()
+print("Saved: A3_CONV_Importance_RF_only.png")
 
 # ===================================================================
 # A4: PURITY IMPORTANCE (RF & XGB separately)
@@ -574,9 +625,26 @@ ax.legend(fontsize=12, framealpha=0.9)
 plt.tight_layout()
 plt.savefig(output_dir / 'A4_PURITY_Importance.png', dpi=1000, bbox_inches='tight')
 plt.close()
-print("✓ Saved: A4_PURITY_Importance.png")
+print("Saved: A4_PURITY_Importance.png")
 
-print(f"\n✓ All visualizations saved to: {output_dir.absolute()}")
+# A4 RF-only
+fig, ax = plt.subplots(figsize=(10, 6))
+rf_only_df = a4_importance_df.sort_values('RF_Importance', ascending=False)
+variables_rf = [VARIABLE_LABELS.get(v, v) for v in rf_only_df['Variable']]
+y_pos_rf = np.arange(len(variables_rf))
+ax.barh(y_pos_rf, rf_only_df['RF_Importance'].values, color=magma_cmap(0.3))
+ax.set_yticks(y_pos_rf)
+ax.set_yticklabels(variables_rf)
+ax.set_xlabel('Importance Score', fontsize=16, fontfamily='Arial')
+ax.set_xlim(0, 1.0)
+ax.tick_params(axis='both', labelsize=14)
+ax.invert_yaxis()
+plt.tight_layout()
+plt.savefig(output_dir / 'A4_PURITY_Importance_RF_only.png', dpi=1000, bbox_inches='tight')
+plt.close()
+print("Saved: A4_PURITY_Importance_RF_only.png")
+
+print(f"\nAll visualizations saved to: {output_dir.absolute()}")
 
 # ===================================================================
 # FINAL SUMMARY
@@ -606,4 +674,4 @@ print("Analysis complete using only the best models!")
 print("Clean, focused results for Karisa's amazing project!")
 print("=" * 80)
 
-print("\n🎉 Best Models Analysis Complete! Champion-level results! 🎉")
+print("\nBest Models Analysis Complete! Champion-level results!")

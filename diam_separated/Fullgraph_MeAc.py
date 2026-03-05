@@ -118,18 +118,24 @@ def plot_density_scatter(df, title, output_stem, axis_limits, output_dir):
     )
     ax.scatter([EQ_X], [EQ_Y], marker="*", s=220, color="#F81F8B", edgecolors="none", zorder=5)
 
-    ax.set_title(title)
     ax.set_xlabel("Conversion (%)")
     ax.set_ylabel("Purity (%)")
     ax.xaxis.set_major_formatter(PercentFormatter())
     ax.yaxis.set_major_formatter(PercentFormatter())
     ax.set_xlim(axis_limits[0], 100)
     ax.set_ylim(axis_limits[2], 100)
+    ax.set_aspect('equal')
+    ax.grid(True, alpha=0.3)
     apply_font(ax)
 
     density_handles = make_density_legend_handles()
+    eq_handle = Line2D(
+        [0], [0], marker="*", linestyle="",
+        markerfacecolor="#F81F8B", markeredgecolor="none",
+        markersize=12, label="Equilibrium",
+    )
     ax.legend(
-        handles=density_handles, title="Density", loc="best", frameon=True,
+        handles=density_handles + [eq_handle], title="Density", loc="best", frameon=True,
         prop={"family": FONT_FAMILY, "size": LEGEND_FONT_SIZE},
         title_fontproperties={"family": FONT_FAMILY, "size": LEGEND_FONT_SIZE},
     )

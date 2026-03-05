@@ -84,19 +84,45 @@ purity_pairs = [
 ]
 
 
+def _index_map(df, col):
+    """Return sorted unique values and a value->index dict for a column."""
+    vals = sorted(df[col].dropna().unique())
+    return vals, {v: i for i, v in enumerate(vals)}
+
+
+def _tick_labels(vals):
+    return [f'{int(v)}' if v == int(v) else f'{v:g}' for v in vals]
+
+
 def save_hydraulic_plot(var1, var2):
     fig, ax = plt.subplots(figsize=(8, 8))
 
+    # Map raw values to integer indices so each grid cell is equally sized,
+    # matching the discrete contour map layout for clean overlay.
+    x_vals, x_map = _index_map(df_full, var1)
+    y_vals, y_map = _index_map(df_full, var2)
+
+    df_plot = df_full.copy()
+    df_plot['_x'] = df_plot[var1].map(x_map)
+    df_plot['_y'] = df_plot[var2].map(y_map)
+
     sns.scatterplot(
-        data=df_full,
-        x=var1,
-        y=var2,
+        data=df_plot,
+        x='_x',
+        y='_y',
         hue="DESC",
         palette=DESC_COLORS,
         alpha=0.5,
         s=30,
         ax=ax,
     )
+
+    ax.set_xticks(range(len(x_vals)))
+    ax.set_xticklabels(_tick_labels(x_vals), rotation=45, ha='right')
+    ax.set_yticks(range(len(y_vals)))
+    ax.set_yticklabels(_tick_labels(y_vals))
+    ax.set_xlim(-0.5, len(x_vals) - 0.5)
+    ax.set_ylim(-0.5, len(y_vals) - 0.5)
 
     format_axis_for_paper(ax, xlabel=var1, ylabel=var2)
     ax.grid(True, alpha=0.3)
@@ -112,14 +138,29 @@ def save_hydraulic_plot(var1, var2):
 def save_continuous_plot(var1, var2, target_col, label, output_dir):
     fig, ax = plt.subplots(figsize=(8, 8))
 
+    # Map raw values to integer indices so each grid cell is equally sized,
+    # matching the discrete contour map layout for clean overlay.
+    x_vals, x_map = _index_map(df_pass, var1)
+    y_vals, y_map = _index_map(df_pass, var2)
+
+    x_idx = df_pass[var1].map(x_map)
+    y_idx = df_pass[var2].map(y_map)
+
     scatter = ax.scatter(
-        df_pass[var1],
-        df_pass[var2],
+        x_idx,
+        y_idx,
         c=df_pass[target_col],
         cmap=CONTINUOUS_CMAP,
         alpha=0.5,
         s=30,
     )
+
+    ax.set_xticks(range(len(x_vals)))
+    ax.set_xticklabels(_tick_labels(x_vals), rotation=45, ha='right')
+    ax.set_yticks(range(len(y_vals)))
+    ax.set_yticklabels(_tick_labels(y_vals))
+    ax.set_xlim(-0.5, len(x_vals) - 0.5)
+    ax.set_ylim(-0.5, len(y_vals) - 0.5)
 
     cbar = fig.colorbar(scatter, ax=ax)
     format_axis_for_paper(ax, xlabel=var1, ylabel=var2, colorbar_label=label, cbar=cbar)

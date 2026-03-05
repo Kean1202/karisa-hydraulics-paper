@@ -236,7 +236,7 @@ with pd.ExcelWriter(output_excel, engine='openpyxl') as writer:
     a4_importance_df.to_excel(writer, sheet_name='A4_PURITY_Importance', index=False)
     a4_comparison_df.to_excel(writer, sheet_name='A4_PURITY_Models', index=False)
 
-print(f"\n✓ Results saved to: {output_excel}")
+print(f"\nResults saved to: {output_excel}")
 
 # ===================================================================
 # Visualizations
@@ -266,13 +266,35 @@ def save_importance_bar(importance_df, filename, title_label):
     plt.tight_layout()
     plt.savefig(plot_dir / filename, dpi=1000, bbox_inches='tight')
     plt.close()
-    print(f"✓ Saved: {filename}")
+    print(f"Saved: {filename}")
+
+
+def save_importance_bar_rf_only(importance_df, filename):
+    fig, ax = plt.subplots(figsize=(10, 6))
+    df_sorted = importance_df.sort_values('RF_Importance', ascending=False)
+    variables = [VARIABLE_LABELS.get(v, v) for v in df_sorted['Variable']]
+    y_pos = np.arange(len(variables))
+    ax.barh(y_pos, df_sorted['RF_Importance'].values, color=magma_cmap(0.3))
+    ax.set_yticks(y_pos)
+    ax.set_yticklabels(variables)
+    ax.set_xlabel('Importance Score', fontsize=16, fontfamily='Arial')
+    ax.set_xlim(0, 1.0)
+    ax.tick_params(axis='both', labelsize=14)
+    ax.invert_yaxis()
+    plt.tight_layout()
+    plt.savefig(plot_dir / filename, dpi=1000, bbox_inches='tight')
+    plt.close()
+    print(f"Saved: {filename}")
 
 
 save_importance_bar(a1_importance_df, 'A1_WEEP_Importance.png', 'A1 WEEP')
+save_importance_bar_rf_only(a1_importance_df, 'A1_WEEP_Importance_RF_only.png')
 save_importance_bar(a2_importance_df, 'A2_FLOOD_Importance.png', 'A2 FLOOD')
+save_importance_bar_rf_only(a2_importance_df, 'A2_FLOOD_Importance_RF_only.png')
 save_importance_bar(a3_importance_df, 'A3_CONV_Importance.png', 'A3 CONV')
+save_importance_bar_rf_only(a3_importance_df, 'A3_CONV_Importance_RF_only.png')
 save_importance_bar(a4_importance_df, 'A4_PURITY_Importance.png', 'A4 PURITY')
+save_importance_bar_rf_only(a4_importance_df, 'A4_PURITY_Importance_RF_only.png')
 
-print(f"\n✓ All outputs saved under: {DIAM_OUT.absolute()}")
-print(f"\n🎉 Best Models Analysis Complete for {DIAM_LABEL}! 🎉")
+print(f"\nAll outputs saved under: {DIAM_OUT.absolute()}")
+print(f"\nBest Models Analysis Complete for {DIAM_LABEL}!")

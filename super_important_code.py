@@ -74,13 +74,13 @@ def main():
 
     print("\nLoading project parameters...")
     pause(0.5)
-    print("✓ NHOLES: Loaded")
-    print("✓ HDIAM: Loaded")
-    print("✓ TRAYSPC: Loaded")
-    print("✓ WEIRHT: Loaded")
-    print("✓ DECK: Loaded")
-    print("✓ DIAM: Loaded")
-    print("✓ NPASS: Loaded")
+    print("NHOLES: Loaded")
+    print("HDIAM: Loaded")
+    print("TRAYSPC: Loaded")
+    print("WEIRHT: Loaded")
+    print("DECK: Loaded")
+    print("DIAM: Loaded")
+    print("NPASS: Loaded")
     pause(1)
 
     print("\nAnalyzing correlation between variables...")
@@ -221,7 +221,7 @@ def main():
     filename = f'for_karisa_with_love_{timestamp}.png'
     plt.savefig(filename, dpi=1000, bbox_inches='tight', facecolor='white')
 
-    print(f"\n✓ Chart saved: {filename}")
+    print(f"\nChart saved: {filename}")
     print("\nDisplaying visualization...")
     plt.show()
 

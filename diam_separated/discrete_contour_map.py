@@ -84,6 +84,9 @@ def save_single_discrete_contour(df, var1, var2, target_col, colorbar_label,
         return False
 
     levels = build_levels(values, fixed_levels=fixed_levels)
+    # White contour lines at 25%, 50%, 75% of the value range (evenly spaced).
+    lo, hi = levels[0], levels[-1]
+    line_levels = np.array([lo + 0.25*(hi-lo), lo + 0.50*(hi-lo), lo + 0.75*(hi-lo)])
     x_grid, y_grid = np.meshgrid(np.arange(len(x_vals)), np.arange(len(y_vals)))
 
     fig = plt.figure(figsize=(8, 8))
@@ -91,13 +94,9 @@ def save_single_discrete_contour(df, var1, var2, target_col, colorbar_label,
     ax = fig.add_subplot(gs[0, 0])
     cax = fig.add_subplot(gs[0, 1])
 
-    contourf = ax.contourf(x_grid, y_grid, z_vals, levels=levels, cmap='magma', alpha=0.8, extend='neither')
-    contour = ax.contour(x_grid, y_grid, z_vals, levels=levels, colors='white', linewidths=1.5, alpha=1.0)
-    label_step = max(1, len(levels) // 5)
-    label_levels = levels[::label_step]
-    if levels[-1] not in label_levels:
-        label_levels = np.append(label_levels, levels[-1])
-    contour_labels = ax.clabel(contour, levels=label_levels, inline=True, fontsize=11, fmt=label_fmt)
+    contourf = ax.contourf(x_grid, y_grid, z_vals, levels=levels, cmap='magma_r', alpha=0.8, extend='neither')
+    contour = ax.contour(x_grid, y_grid, z_vals, levels=line_levels, colors='white', linewidths=1.5, alpha=1.0)
+    contour_labels = ax.clabel(contour, levels=line_levels, inline=True, fontsize=11, fmt=label_fmt)
     for txt in contour_labels:
         txt.set_fontweight('bold')
 
