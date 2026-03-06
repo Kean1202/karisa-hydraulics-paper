@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 from matplotlib.lines import Line2D
-from matplotlib.ticker import PercentFormatter
+from matplotlib.ticker import MultipleLocator, PercentFormatter
 from scipy.stats import gaussian_kde
 
 from utils import create_binary_targets, filter_invalid_values, load_data
@@ -143,8 +143,12 @@ def plot_density_scatter(df, title, output_stem, axis_limits, output_dir):
     ax.set_ylabel("Purity (%)")
     ax.xaxis.set_major_formatter(PercentFormatter())
     ax.yaxis.set_major_formatter(PercentFormatter())
-    ax.set_xlim(axis_limits[0], 100)
-    ax.set_ylim(axis_limits[2], 100)
+    shared_lo = min(axis_limits[0], axis_limits[2])
+    ax.set_xlim(shared_lo, 100)
+    ax.set_ylim(shared_lo, 100)
+    ax.xaxis.set_major_locator(MultipleLocator(2.5))
+    ax.yaxis.set_major_locator(MultipleLocator(2.5))
+    ax.tick_params(axis='x', rotation=45)
     ax.set_aspect('equal')
     ax.grid(True, alpha=0.3)
     apply_font(ax)
