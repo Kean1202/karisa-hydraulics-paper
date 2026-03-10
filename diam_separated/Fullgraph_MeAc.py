@@ -19,6 +19,7 @@ import warnings
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+from matplotlib.colors import Normalize
 from matplotlib.lines import Line2D
 from matplotlib.ticker import MultipleLocator, PercentFormatter
 from scipy.stats import gaussian_kde
@@ -47,7 +48,6 @@ plt.rcParams.update({
     "legend.fontsize": LEGEND_FONT_SIZE,
 })
 
-DENSITY_LEVELS = np.array([0.1, 0.2, 0.3, 0.4, 0.5], dtype=float)
 CMAP = plt.cm.magma
 
 EQ_X = 98.1990652
@@ -78,42 +78,28 @@ def nice_round_limits(min_val, max_val, padding_ratio=0.05):
     return nice_min, nice_max
 
 
-def compute_scaled_density(x_vals, y_vals):
+def compute_kde_density(x_vals, y_vals):
     points = np.vstack([x_vals, y_vals])
     try:
         kde = gaussian_kde(points)
         density_raw = kde(points)
     except Exception:
         density_raw = np.ones_like(x_vals, dtype=float)
-    if np.max(density_raw) <= 0:
-        return np.zeros_like(density_raw, dtype=float)
-    density_scaled = (density_raw / np.max(density_raw)) * 0.5
-    return np.clip(density_scaled, 0.0, 0.5)
+    density_raw = np.nan_to_num(density_raw, nan=0.0, posinf=0.0, neginf=0.0)
+    density_raw[density_raw < 0] = 0.0
+    return density_raw
 
 
-def make_density_legend_handles():
-    handles = []
-    for level in DENSITY_LEVELS:
-        color = CMAP(level / 0.5)
-        handles.append(Line2D(
-            [0], [0], marker="o", linestyle="",
-            markerfacecolor=color, markeredgecolor="none",
-            markersize=9, label=f"{level:.1f}",
-        ))
-    return handles
-
-
-def plot_density_scatter(df, title, output_stem, axis_limits, output_dir):
+def plot_density_scatter(df, density, title, output_stem, axis_limits, output_dir, norm):
     fig, ax = plt.subplots(figsize=(10, 6))
 
     x = df["CONV_PCT"].to_numpy()
     y = df["PURITY_PCT"].to_numpy()
-    density = compute_scaled_density(x, y)
 
     order = np.argsort(density)
-    ax.scatter(
+    scatter = ax.scatter(
         x[order], y[order], c=density[order],
-        cmap=CMAP, vmin=0.0, vmax=0.5,
+        cmap=CMAP, norm=norm,
         s=80, alpha=0.75, edgecolors="none",
     )
     ax.scatter([EQ_X], [EQ_Y], marker="*", s=220, color="#F81F8B", edgecolors="none", zorder=5)
@@ -130,15 +116,21 @@ def plot_density_scatter(df, title, output_stem, axis_limits, output_dir):
     ax.set_aspect('equal')
     ax.grid(True, alpha=0.3)
     apply_font(ax)
+    cbar = fig.colorbar(scatter, ax=ax)
+    cbar.set_label("KDE density")
+    cbar.ax.yaxis.label.set_fontname(FONT_FAMILY)
+    cbar.ax.yaxis.label.set_fontsize(AXIS_LABEL_SIZE)
+    for tick in cbar.ax.get_yticklabels():
+        tick.set_fontname(FONT_FAMILY)
+        tick.set_fontsize(TICK_LABEL_SIZE)
 
-    density_handles = make_density_legend_handles()
     eq_handle = Line2D(
         [0], [0], marker="*", linestyle="",
         markerfacecolor="#F81F8B", markeredgecolor="none",
         markersize=12, label="Equilibrium",
     )
     ax.legend(
-        handles=density_handles + [eq_handle], title="Density", loc="best", frameon=True,
+        handles=[eq_handle], title="Marker", loc="best", frameon=True,
         prop={"family": FONT_FAMILY, "size": LEGEND_FONT_SIZE},
         title_fontproperties={"family": FONT_FAMILY, "size": LEGEND_FONT_SIZE},
     )
@@ -167,6 +159,12 @@ def main():
     df_full["PURITY_PCT"] = df_full["PURITY"] * 100
     df_pass["CONV_PCT"] = df_pass["CONV"] * 100
     df_pass["PURITY_PCT"] = df_pass["PURITY"] * 100
+    density_full = compute_kde_density(df_full["CONV_PCT"].to_numpy(), df_full["PURITY_PCT"].to_numpy())
+    density_pass = compute_kde_density(df_pass["CONV_PCT"].to_numpy(), df_pass["PURITY_PCT"].to_numpy())
+    shared_vmax = max(float(np.max(density_full)), float(np.max(density_pass)))
+    if shared_vmax <= 0:
+        shared_vmax = 1.0
+    density_norm = Normalize(vmin=0.0, vmax=shared_vmax)
 
     conv_all = np.concatenate([df_full["CONV_PCT"].dropna(), df_pass["CONV_PCT"].dropna()])
     purity_all = np.concatenate([df_full["PURITY_PCT"].dropna(), df_pass["PURITY_PCT"].dropna()])
@@ -176,17 +174,21 @@ def main():
 
     plot_density_scatter(
         df=df_full,
+        density=density_full,
         title=f"MeAc Conversion vs Purity (Full Dataset, {DIAM_LABEL})",
         output_stem="full_dataset_density_scatter",
         axis_limits=axis_limits,
         output_dir=output_dir,
+        norm=density_norm,
     )
     plot_density_scatter(
         df=df_pass,
+        density=density_pass,
         title=f"MeAc Conversion vs Purity (Pass-Only, {DIAM_LABEL})",
         output_stem="pass_only_density_scatter",
         axis_limits=axis_limits,
         output_dir=output_dir,
+        norm=density_norm,
     )
 
     print(f"\nDone. Saved to: {output_dir.resolve()}")
