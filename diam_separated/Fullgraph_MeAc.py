@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
 MeAc Full Scatter Graph - DIAM-Separated Version
 
@@ -104,20 +104,23 @@ def plot_density_scatter(df, density, title, output_stem, axis_limits, output_di
     )
     ax.scatter([EQ_X], [EQ_Y], marker="*", s=220, color="#F81F8B", edgecolors="none", zorder=5)
 
-    ax.set_xlabel("Conversion (%)")
-    ax.set_ylabel("Purity (%)")
-    ax.xaxis.set_major_formatter(PercentFormatter())
-    ax.yaxis.set_major_formatter(PercentFormatter())
-    ax.set_xlim(axis_limits[0], 100)
+    ax.set_xlabel("Conversion")
+    ax.set_ylabel("Purity")
+    ax.xaxis.set_major_formatter(PercentFormatter(xmax=100, decimals=0))
+    ax.yaxis.set_major_formatter(PercentFormatter(xmax=100, decimals=0))
+    x_min = int(math.floor(axis_limits[0] / 2.0) * 2)
+    ax.set_xlim(max(0, x_min - 0.8), 100)
     ax.set_ylim(90, 100)
-    ax.xaxis.set_major_locator(MultipleLocator(2.5))
-    ax.yaxis.set_major_locator(MultipleLocator(2.5))
-    ax.tick_params(axis='x', rotation=45)
+    ax.xaxis.set_major_locator(MultipleLocator(2))
+    ax.yaxis.set_major_locator(MultipleLocator(2))
+    ax.tick_params(axis='x', rotation=35)
     ax.set_aspect('equal')
     ax.grid(True, alpha=0.3)
     apply_font(ax)
+    for tick in ax.get_xticklabels():
+        tick.set_ha("right")
     cbar = fig.colorbar(scatter, ax=ax)
-    cbar.set_label("KDE density")
+    cbar.set_label("Density")
     cbar.ax.yaxis.label.set_fontname(FONT_FAMILY)
     cbar.ax.yaxis.label.set_fontsize(AXIS_LABEL_SIZE)
     for tick in cbar.ax.get_yticklabels():
@@ -196,3 +199,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

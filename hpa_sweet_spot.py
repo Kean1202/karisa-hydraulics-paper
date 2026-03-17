@@ -193,10 +193,10 @@ def main():
         HPA_LABELS, score_vals,
         color=colors, edgecolor="white", linewidth=0.5
     )
-    ax3.set_xlabel("Combined score (0–1)", fontsize=14, fontfamily=FONT)
-    ax3.set_ylabel("HPA bin", fontsize=14, fontfamily=FONT)
+    ax3.set_xlabel("Combined score (0–1)", fontsize=18, fontfamily=FONT)
+    ax3.set_ylabel("HPA bin", fontsize=18, fontfamily=FONT)
     ax3.set_xlim(0, 1.08)
-    ax3.tick_params(labelsize=12)
+    ax3.tick_params(labelsize=14)
     ax3.invert_yaxis()
 
     for bar, val, ok in zip(bars, score_vals, valid):
@@ -204,7 +204,7 @@ def main():
             ax3.text(
                 val + 0.02, bar.get_y() + bar.get_height() / 2,
                 f"{val:.3f}", va="center", ha="left",
-                fontsize=11, fontfamily=FONT,
+                fontsize=13, fontfamily=FONT,
             )
 
     plt.tight_layout()

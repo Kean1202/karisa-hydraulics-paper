@@ -505,7 +505,7 @@ def print_phase_complete(phase_name):
 VARIABLE_LABELS = {
     'NHOLES': 'Number of holes',
     'HDIAM': 'Hole Diameter (m)',
-    'DIAM': 'Diameter (m)',
+    'DIAM': 'Column Diameter (m)',
     'WEIRHT': 'Weir Height (m)',
     'TRAYSPC': 'Tray spacing (m)',
     'DECK': 'Deck Thickness (mm)',
@@ -536,12 +536,13 @@ def get_variable_label(var_name):
 
 
 def format_axis_for_paper(ax, xlabel=None, ylabel=None,
-                          title=None, colorbar_label=None, cbar=None):
+                          title=None, colorbar_label=None, cbar=None,
+                          label_fontsize=16, tick_fontsize=14):
     """
     Format axes according to paper requirements:
     - Font: Arial
-    - Axis labels: 16pt
-    - Axis ticks: 14pt
+    - Axis labels: label_fontsize (default 16pt)
+    - Axis ticks: tick_fontsize (default 14pt)
     - No titles
 
     Args:
@@ -551,6 +552,8 @@ def format_axis_for_paper(ax, xlabel=None, ylabel=None,
         title: Ignored (titles removed for paper)
         colorbar_label: Label for colorbar if present
         cbar: Colorbar object
+        label_fontsize: Font size for axis labels (default 16)
+        tick_fontsize: Font size for tick labels (default 14)
     """
     # Set font to Arial
     import matplotlib.pyplot as plt
@@ -562,14 +565,14 @@ def format_axis_for_paper(ax, xlabel=None, ylabel=None,
     # Set axis labels with proper formatting
     if xlabel is not None:
         label_text = get_variable_label(xlabel) if xlabel in VARIABLE_LABELS else xlabel
-        ax.set_xlabel(label_text, fontsize=16, fontfamily='Arial')
+        ax.set_xlabel(label_text, fontsize=label_fontsize, fontfamily='Arial')
 
     if ylabel is not None:
         label_text = get_variable_label(ylabel) if ylabel in VARIABLE_LABELS else ylabel
-        ax.set_ylabel(label_text, fontsize=16, fontfamily='Arial')
+        ax.set_ylabel(label_text, fontsize=label_fontsize, fontfamily='Arial')
 
     # Set tick label sizes
-    ax.tick_params(axis='both', which='major', labelsize=14)
+    ax.tick_params(axis='both', which='major', labelsize=tick_fontsize)
 
     # Format tick labels to use Arial
     for label in ax.get_xticklabels() + ax.get_yticklabels():
@@ -577,8 +580,8 @@ def format_axis_for_paper(ax, xlabel=None, ylabel=None,
 
     # Format colorbar if present
     if cbar is not None and colorbar_label is not None:
-        cbar.set_label(colorbar_label, fontsize=16, fontfamily='Arial')
-        cbar.ax.tick_params(labelsize=14)
+        cbar.set_label(colorbar_label, fontsize=label_fontsize, fontfamily='Arial')
+        cbar.ax.tick_params(labelsize=tick_fontsize)
         for label in cbar.ax.get_yticklabels():
             label.set_fontfamily('Arial')
 

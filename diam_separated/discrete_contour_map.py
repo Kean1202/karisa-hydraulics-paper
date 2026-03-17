@@ -67,6 +67,22 @@ def build_levels(values, fixed_levels=None):
     return levels
 
 
+CONTOUR_LABEL_FONTSIZE = 20
+CONTOUR_TICK_FONTSIZE = 16
+
+# Per-variable decimal precision for tick labels (None = auto)
+_VAR_DECIMALS = {
+    'HDIAM': 6,
+    'WEIRHT': 4,
+}
+
+
+def _tick_label(v, decimals=None):
+    if decimals is not None:
+        return f'{v:.{decimals}f}'
+    return f'{int(v)}' if v == int(v) else f'{v:g}'
+
+
 def save_single_discrete_contour(df, var1, var2, target_col, colorbar_label,
                                   output_path, fixed_levels=None, label_fmt='%.4f',
                                   cbar_ticks=None, cbar_tick_fmt='%.2f'):
@@ -96,7 +112,7 @@ def save_single_discrete_contour(df, var1, var2, target_col, colorbar_label,
 
     contourf = ax.contourf(x_grid, y_grid, z_vals, levels=levels, cmap='magma_r', alpha=0.8, extend='neither')
     contour = ax.contour(x_grid, y_grid, z_vals, levels=line_levels, colors='white', linewidths=1.5, alpha=1.0)
-    contour_labels = ax.clabel(contour, levels=line_levels, inline=True, fontsize=11, fmt=label_fmt)
+    contour_labels = ax.clabel(contour, levels=line_levels, inline=True, fontsize=14, fmt=label_fmt)
     for txt in contour_labels:
         txt.set_fontweight('bold')
 
@@ -109,13 +125,15 @@ def save_single_discrete_contour(df, var1, var2, target_col, colorbar_label,
 
     ax.set_xticks(np.arange(len(x_vals)))
     ax.set_yticks(np.arange(len(y_vals)))
-    ax.set_xticklabels([f'{int(v)}' if v == int(v) else f'{v:g}' for v in x_vals], rotation=45, ha='right')
-    ax.set_yticklabels([f'{int(v)}' if v == int(v) else f'{v:g}' for v in y_vals])
+    ax.set_xticklabels([_tick_label(v, _VAR_DECIMALS.get(var1)) for v in x_vals], rotation=45, ha='right')
+    ax.set_yticklabels([_tick_label(v, _VAR_DECIMALS.get(var2)) for v in y_vals])
 
     cbar = fig.colorbar(contourf, cax=cax, ticks=cbar_ticks)
     if cbar_tick_fmt:
         cbar.ax.yaxis.set_major_formatter(FormatStrFormatter(cbar_tick_fmt))
-    format_axis_for_paper(ax, xlabel=var1, ylabel=var2, colorbar_label=colorbar_label, cbar=cbar)
+    format_axis_for_paper(ax, xlabel=var1, ylabel=var2, colorbar_label=colorbar_label, cbar=cbar,
+                          label_fontsize=CONTOUR_LABEL_FONTSIZE,
+                          tick_fontsize=CONTOUR_TICK_FONTSIZE)
     ax.set_xlim(-0.5, len(x_vals) - 0.5)
     ax.set_ylim(-0.5, len(y_vals) - 0.5)
     ax.set_box_aspect(1)
